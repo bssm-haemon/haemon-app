@@ -1,26 +1,34 @@
 "use client";
 
 import MainLayout from "@/components/MainLayout";
+import PokemonHeader from "@/components/PokemonHeader";
 import { useState } from "react";
 import { Filter } from "lucide-react";
 import clsx from "clsx";
-import PokemonHeader from "@/components/PokemonHeader";
-import { useCreatures } from "@/hooks/useCreatures";
+import Image from "next/image";
 import { useCollection, useCollectionStats } from "@/hooks/useCollection";
-import { Rarity } from "@/types";
+import { STATIC_CREATURES, Rarity } from "@/data/creatures";
 
 export default function CollectionPage() {
-  const [filter, setFilter] = useState<"all" | Rarity>("all");
-  const [showFilter, setShowFilter] = useState(false);
-
-  const { data: creaturesData } = useCreatures(filter !== "all" ? { rarity: filter } : {});
+  const [selectedRarity, setSelectedRarity] = useState<Rarity | "all">("all");
   const { data: collectionData } = useCollection();
   const { data: stats } = useCollectionStats();
 
+  // 발견한 생물 ID 목록
+  const discoveredIds = new Set(
+    collectionData?.collection?.map((item) => item.creature.id) || []
+  );
+
+  // 필터링된 생물 목록
+  const filteredCreatures =
+    selectedRarity === "all"
+      ? STATIC_CREATURES
+      : STATIC_CREATURES.filter((c) => c.rarity === selectedRarity);
+
   const rarityColors = {
-    common: { bg: "bg-blue-50", border: "border-blue-200", badge: "bg-blue-100 text-blue-800" },
-    rare: { bg: "bg-purple-50", border: "border-purple-200", badge: "bg-purple-100 text-purple-800" },
-    legendary: { bg: "bg-yellow-50", border: "border-yellow-200", badge: "bg-yellow-100 text-yellow-800" },
+    common: "bg-gray-100 text-gray-700 border-gray-300",
+    rare: "bg-blue-100 text-blue-700 border-blue-300",
+    legendary: "bg-purple-100 text-purple-700 border-purple-300",
   };
 
   const rarityLabels = {
@@ -29,90 +37,149 @@ export default function CollectionPage() {
     legendary: "전설",
   };
 
-  const isDiscovered = (creatureId: string) => {
-    return collectionData?.collection.some(item => item.creature.id === creatureId);
-  };
-
   return (
     <MainLayout>
       <div className="p-4">
-        <PokemonHeader className="mb-4" />
+        <PokemonHeader className="mb-6" />
 
-        {/* Filter Controls */}
-        <div className="mb-4">
-          <button
-            onClick={() => setShowFilter(!showFilter)}
-            className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-          >
-            <Filter size={18} />
-            <span className="text-sm font-semibold">필터</span>
-          </button>
-
-          {showFilter && (
-            <div className="mt-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
-              <div className="flex flex-wrap gap-2">
-                {(["all", "common", "rare", "legendary"] as const).map(rarity => (
-                  <button
-                    key={rarity}
-                    onClick={() => setFilter(rarity)}
-                    className={clsx(
-                      "px-3 py-1 rounded-full text-xs font-semibold transition-all",
-                      filter === rarity
-                        ? "bg-blue-600 text-white"
-                        : "bg-white text-gray-700 border border-gray-300 hover:border-gray-400",
-                    )}
-                  >
-                    {rarity === "all" ? "전체" : rarityLabels[rarity as Rarity]}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+        {/* Stats Card */}
+        <div className="bg-gradient-to-r from-blue-500 to-teal-500 rounded-lg p-4 text-white mb-6">
+          <h2 className="text-lg font-bold mb-2">도감 완성률</h2>
+          <div className="flex items-end gap-2 mb-3">
+            <span className="text-4xl font-bold">
+              {stats?.discovered_count || 0}
+            </span>
+            <span className="text-xl opacity-90 mb-1">
+              / {stats?.total_creatures || STATIC_CREATURES.length}
+            </span>
+          </div>
+          <div className="w-full bg-white/30 rounded-full h-3 overflow-hidden">
+            <div
+              className="bg-white h-full rounded-full transition-all duration-500"
+              style={{
+                width: `${stats?.completion_rate || 0}%`,
+              }}
+            />
+          </div>
+          <p className="text-sm mt-2 opacity-90">
+            {stats?.completion_rate?.toFixed(1) || 0}% 완료
+          </p>
         </div>
 
-        {/* Collection Grid */}
-        <div className="grid grid-cols-3 gap-3">
-          {creaturesData?.creatures.map(creature => {
-            const discovered = isDiscovered(creature.id);
-            const colors = rarityColors[creature.rarity];
+        {/* Rarity Stats */}
+        <div className="grid grid-cols-3 gap-3 mb-6">
+          {(["common", "rare", "legendary"] as Rarity[]).map((rarity) => {
+            const rarityStats = stats?.by_rarity?.[rarity];
             return (
               <div
-                key={creature.id}
+                key={rarity}
                 className={clsx(
-                  "rounded-lg border-2 p-3 text-center cursor-pointer transition-transform hover:scale-105 aspect-square flex flex-col items-center justify-center",
-                  colors.bg,
-                  colors.border,
+                  "rounded-lg p-3 text-center border-2",
+                  rarityColors[rarity]
                 )}
               >
-                {discovered ? (
-                  <>
-                    <img src={creature.image_url} alt={creature.name} className="w-12 h-12 object-contain mb-2" />
-                    <p className="text-[10px] font-semibold text-gray-900 truncate w-full">{creature.name}</p>
-                    <span className={clsx("inline-block mt-1 px-1.5 py-0.5 rounded text-[8px] font-bold", colors.badge)}>
-                      {rarityLabels[creature.rarity]}
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    <div className="text-4xl mb-2 blur-sm opacity-30 grayscale saturate-0">?</div>
-                    <p className="text-[10px] font-semibold text-gray-400">미발견</p>
-                  </>
-                )}
+                <p className="text-xs font-semibold mb-1">
+                  {rarityLabels[rarity]}
+                </p>
+                <p className="text-lg font-bold">
+                  {rarityStats?.discovered || 0}/{rarityStats?.total || 0}
+                </p>
               </div>
             );
           })}
         </div>
 
-        {/* Stats */}
-        <div className="mt-8 grid grid-cols-3 gap-3">
-          {(["common", "rare", "legendary"] as const).map(rarity => {
-            const stat = stats?.by_rarity?.[rarity];
+        {/* Filter Buttons */}
+        <div className="flex items-center gap-2 mb-4">
+          <Filter size={18} className="text-gray-600" />
+          <div className="flex gap-2 flex-1 overflow-x-auto">
+            <button
+              onClick={() => setSelectedRarity("all")}
+              className={clsx(
+                "px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap transition-all",
+                selectedRarity === "all"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              )}
+            >
+              전체
+            </button>
+            {(["common", "rare", "legendary"] as Rarity[]).map((rarity) => (
+              <button
+                key={rarity}
+                onClick={() => setSelectedRarity(rarity)}
+                className={clsx(
+                  "px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap transition-all border-2",
+                  selectedRarity === rarity
+                    ? rarityColors[rarity]
+                    : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"
+                )}
+              >
+                {rarityLabels[rarity]}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Creatures Grid */}
+        <div className="grid grid-cols-2 gap-4">
+          {filteredCreatures.map((creature) => {
+            const isDiscovered = discoveredIds.has(creature.id);
+
             return (
-              <div key={rarity} className="p-3 bg-gray-50 rounded-lg border border-gray-200 text-center">
-                <p className="text-[10px] text-gray-600 font-semibold">{rarityLabels[rarity]}</p>
-                <p className="text-lg font-bold text-gray-900 mt-1">
-                  {stat?.discovered ?? 0}/{stat?.total ?? 0}
-                </p>
+              <div
+                key={creature.id}
+                className={clsx(
+                  "bg-white rounded-lg border-2 overflow-hidden transition-all",
+                  isDiscovered
+                    ? "border-blue-200 hover:shadow-lg"
+                    : "border-gray-200 opacity-75"
+                )}
+              >
+                {/* Image */}
+                <div className="aspect-square bg-gray-50 relative overflow-hidden">
+                  <Image
+                    src={creature.image_path}
+                    alt={isDiscovered ? creature.name : "???"}
+                    fill
+                    className={clsx(
+                      "object-contain p-3 transition-all",
+                      !isDiscovered && "blur-md grayscale"
+                    )}
+                  />
+                  {!isDiscovered && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                      <span className="text-4xl font-bold text-white drop-shadow-lg">
+                        ?
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Info */}
+                <div className="p-3">
+                  <div className="flex items-center justify-between mb-1">
+                    <h3 className="font-bold text-gray-900">
+                      {isDiscovered ? creature.name : "???"}
+                    </h3>
+                    <span
+                      className={clsx(
+                        "text-xs px-2 py-0.5 rounded-full font-semibold border",
+                        rarityColors[creature.rarity]
+                      )}
+                    >
+                      {rarityLabels[creature.rarity]}
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-600 line-clamp-2">
+                    {isDiscovered ? creature.description : "아직 발견하지 못한 생물입니다."}
+                  </p>
+                  {isDiscovered && (
+                    <p className="text-xs text-blue-600 font-semibold mt-2">
+                      +{creature.points}p
+                    </p>
+                  )}
+                </div>
               </div>
             );
           })}
