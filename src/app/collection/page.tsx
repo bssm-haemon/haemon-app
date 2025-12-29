@@ -15,9 +15,7 @@ export default function CollectionPage() {
   const { data: stats } = useCollectionStats();
 
   // 발견한 생물 ID 목록
-  const discoveredIds = new Set(
-    collectionData?.collection?.map((item) => item.creature.id) || []
-  );
+  const discoveredIds = new Set(collectionData?.collection?.map(item => item.creature_id) || []);
 
   // 필터링된 생물 목록
   const filteredCreatures =

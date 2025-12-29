@@ -7,13 +7,14 @@ interface CreaturesResponse {
     total: number;
 }
 
-export const useCreatures = (params?: { category?: CreatureCategory; rarity?: Rarity }) => {
+export const useCreatures = (params?: { category?: CreatureCategory; rarity?: Rarity }, options?: { enabled?: boolean }) => {
     return useQuery<CreaturesResponse>({
         queryKey: ["creatures", params],
         queryFn: async () => {
             const { data } = await apiClient.get("/creatures", { params });
             return data;
         },
+        enabled: options?.enabled,
     });
 };
 
