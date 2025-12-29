@@ -2,19 +2,22 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Plus, BookOpen, Map, User } from "lucide-react";
+import { Home, Plus, BookOpen, Map, User, ShieldCheck } from "lucide-react";
 import clsx from "clsx";
-
-const navItems = [
-  { href: "/", icon: Home, label: "홈" },
-  { href: "/register", icon: Plus, label: "등록" },
-  { href: "/collection", icon: BookOpen, label: "도감" },
-  { href: "/map", icon: Map, label: "지도" },
-  { href: "/profile", icon: User, label: "프로필" },
-];
+import { useUserDetail } from "@/hooks/useUser";
 
 export default function BottomNavBar() {
   const pathname = usePathname();
+  const { data: user } = useUserDetail();
+
+  const navItems = [
+    { href: "/", icon: Home, label: "홈" },
+    { href: "/register", icon: Plus, label: "등록" },
+    { href: "/collection", icon: BookOpen, label: "도감" },
+    { href: "/map", icon: Map, label: "지도" },
+    ...(user?.is_admin ? [{ href: "/admin", icon: ShieldCheck, label: "관리" }] : []),
+    { href: "/profile", icon: User, label: "프로필" },
+  ];
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-40">
