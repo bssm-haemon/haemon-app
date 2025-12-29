@@ -16,11 +16,11 @@ export default function RegisterPage() {
   const router = useRouter();
 
   // Location state
-  const [coords, setCoords] = useState<{ lat: number, lng: number } | null>(null);
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
 
   useEffect(() => {
     if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition((pos) => {
+      navigator.geolocation.getCurrentPosition(pos => {
         setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude });
       });
     }
@@ -64,10 +64,10 @@ export default function RegisterPage() {
 
       // AI 분석
       classifyCreature.mutate(file, {
-        onSuccess: (data) => {
+        onSuccess: data => {
           setAiSuggestion(data.suggested_creature);
           setAiConfidence(data.confidence);
-        }
+        },
       });
     } else {
       setCreaturePhotoPreview("");
@@ -89,11 +89,11 @@ export default function RegisterPage() {
 
       // AI 분석
       classifyTrash.mutate(file, {
-        onSuccess: (data) => {
+        onSuccess: data => {
           setTrashType(data.trash_type);
           setTrashAiVerified(data.has_trash);
           setTrashAiConfidence(data.confidence);
-        }
+        },
       });
     } else {
       setBeforePhotoPreview("");
@@ -142,7 +142,7 @@ export default function RegisterPage() {
       onSuccess: () => {
         alert("목격 정보가 등록되었습니다!");
         router.push("/");
-      }
+      },
     });
   };
 
@@ -164,7 +164,7 @@ export default function RegisterPage() {
       onSuccess: () => {
         alert("수거 인증이 등록되었습니다!");
         router.push("/");
-      }
+      },
     });
   };
 
@@ -174,25 +174,29 @@ export default function RegisterPage() {
         <PokemonHeader className="mb-6" />
 
         {/* Tab Buttons */}
-        <div className="flex gap-3 mb-6">
+        <div className="flex gap-2 mb-6">
           <button
             onClick={() => setActiveTab("creature")}
             className={clsx(
-              "flex-1 py-3 px-4 rounded-xl font-bold transition-all flex items-center justify-center gap-2",
-              activeTab === "creature" ? "bg-blue-600 text-white shadow-lg" : "bg-gray-100 text-gray-500 hover:bg-gray-200",
+              "flex-1 py-4 px-4 rounded-2xl font-black text-sm uppercase tracking-wide transition-all transform hover:scale-105 border-4",
+              activeTab === "creature"
+                ? "bg-red-500 text-white border-red-600 shadow-lg"
+                : "bg-gray-100 text-gray-600 border-gray-300 hover:bg-gray-200",
             )}
           >
-            <Camera size={20} />
+            <Camera className="inline mr-2" size={20} />
             생물 목격
           </button>
           <button
             onClick={() => setActiveTab("cleanup")}
             className={clsx(
-              "flex-1 py-3 px-4 rounded-xl font-bold transition-all flex items-center justify-center gap-2",
-              activeTab === "cleanup" ? "bg-green-600 text-white shadow-lg" : "bg-gray-100 text-gray-500 hover:bg-gray-200",
+              "flex-1 py-4 px-4 rounded-2xl font-black text-sm uppercase tracking-wide transition-all transform hover:scale-105 border-4",
+              activeTab === "cleanup"
+                ? "bg-green-500 text-white border-green-600 shadow-lg"
+                : "bg-gray-100 text-gray-600 border-gray-300 hover:bg-gray-200",
             )}
           >
-            <Trash2 size={20} />
+            <Trash2 className="inline mr-2" size={20} />
             쓰레기 수거
           </button>
         </div>
@@ -204,11 +208,14 @@ export default function RegisterPage() {
               <input
                 type="file"
                 accept="image/*"
-                onChange={(e) => onCreaturePhotoChange(e.target.files?.[0] || null)}
+                onChange={e => onCreaturePhotoChange(e.target.files?.[0] || null)}
                 className="hidden"
                 id="creatureInput"
               />
-              <label htmlFor="creatureInput" className="block border-2 border-dashed border-gray-300 rounded-2xl p-6 text-center hover:border-blue-500 transition-all cursor-pointer aspect-video flex flex-col items-center justify-center overflow-hidden bg-gray-50">
+              <label
+                htmlFor="creatureInput"
+                className="block border-2 border-dashed border-gray-300 rounded-2xl p-6 text-center hover:border-blue-500 transition-all cursor-pointer aspect-video flex flex-col items-center justify-center overflow-hidden bg-gray-50"
+              >
                 {creaturePhotoPreview ? (
                   <img src={creaturePhotoPreview} className="w-full h-full object-cover" alt="미리보기" />
                 ) : (
@@ -235,7 +242,8 @@ export default function RegisterPage() {
                 <div>
                   <p className="text-xs text-blue-600 font-bold uppercase tracking-wider">AI 분석 결과</p>
                   <p className="text-sm text-blue-900">
-                    <span className="font-bold">"{aiSuggestion}"</span>일 확률이 {Math.round(aiConfidence * 100)}%입니다.
+                    <span className="font-bold">"{aiSuggestion}"</span>일 확률이 {Math.round(aiConfidence * 100)}
+                    %입니다.
                   </p>
                 </div>
               </div>
@@ -245,7 +253,7 @@ export default function RegisterPage() {
               <label className="block text-sm font-bold text-gray-900 mb-2 px-1">메모</label>
               <textarea
                 value={memo}
-                onChange={(e) => setMemo(e.target.value)}
+                onChange={e => setMemo(e.target.value)}
                 placeholder="특이사항이나 발견 당시 상황을 기록해주세요."
                 className="w-full p-4 border border-gray-200 rounded-2xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-gray-50"
                 rows={3}
@@ -275,8 +283,17 @@ export default function RegisterPage() {
           <div className="space-y-5">
             <div className="grid grid-cols-2 gap-4">
               <div className="relative">
-                <input type="file" accept="image/*" onChange={(e) => onBeforePhotoChange(e.target.files?.[0] || null)} className="hidden" id="beforeInput" />
-                <label htmlFor="beforeInput" className="border-2 border-dashed border-gray-300 rounded-2xl p-4 text-center hover:border-green-500 cursor-pointer aspect-square flex flex-col items-center justify-center overflow-hidden bg-gray-50 transition-all">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={e => onBeforePhotoChange(e.target.files?.[0] || null)}
+                  className="hidden"
+                  id="beforeInput"
+                />
+                <label
+                  htmlFor="beforeInput"
+                  className="border-2 border-dashed border-gray-300 rounded-2xl p-4 text-center hover:border-green-500 cursor-pointer aspect-square flex flex-col items-center justify-center overflow-hidden bg-gray-50 transition-all"
+                >
                   {beforePhotoPreview ? (
                     <img src={beforePhotoPreview} className="w-full h-full object-cover" alt="수거 전" />
                   ) : (
@@ -294,8 +311,17 @@ export default function RegisterPage() {
                 )}
               </div>
 
-              <input type="file" accept="image/*" onChange={(e) => onAfterPhotoChange(e.target.files?.[0] || null)} className="hidden" id="afterInput" />
-              <label htmlFor="afterInput" className="border-2 border-dashed border-gray-300 rounded-2xl p-4 text-center hover:border-green-500 cursor-pointer aspect-square flex flex-col items-center justify-center overflow-hidden bg-gray-50 transition-all">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={e => onAfterPhotoChange(e.target.files?.[0] || null)}
+                className="hidden"
+                id="afterInput"
+              />
+              <label
+                htmlFor="afterInput"
+                className="border-2 border-dashed border-gray-300 rounded-2xl p-4 text-center hover:border-green-500 cursor-pointer aspect-square flex flex-col items-center justify-center overflow-hidden bg-gray-50 transition-all"
+              >
                 {afterPhotoPreview ? (
                   <img src={afterPhotoPreview} className="w-full h-full object-cover" alt="수거 후" />
                 ) : (
@@ -313,7 +339,7 @@ export default function RegisterPage() {
                 <label className="block text-sm font-bold text-gray-900 mb-2 px-1">쓰레기 종류</label>
                 <select
                   value={trashType}
-                  onChange={(e) => setTrashType(e.target.value as TrashType)}
+                  onChange={e => setTrashType(e.target.value as TrashType)}
                   className="w-full p-4 border border-gray-200 rounded-2xl text-gray-900 bg-gray-50 focus:ring-2 focus:ring-green-600 outline-none transition-all font-medium"
                 >
                   <option value="plastic">플라스틱</option>
@@ -329,7 +355,7 @@ export default function RegisterPage() {
                 <label className="block text-sm font-bold text-gray-900 mb-2 px-1">수거량</label>
                 <select
                   value={amount}
-                  onChange={(e) => setAmount(e.target.value as CleanupAmount)}
+                  onChange={e => setAmount(e.target.value as CleanupAmount)}
                   className="w-full p-4 border border-gray-200 rounded-2xl text-gray-900 bg-gray-50 focus:ring-2 focus:ring-green-600 outline-none transition-all font-medium"
                 >
                   <option value="handful">한 줌</option>
@@ -360,7 +386,6 @@ export default function RegisterPage() {
           </div>
         )}
       </div>
-
     </MainLayout>
   );
 }

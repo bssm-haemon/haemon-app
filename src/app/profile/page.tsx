@@ -31,41 +31,47 @@ export default function ProfilePage() {
   return (
     <MainLayout>
       <div className="p-4">
-        {/* Profile Header */}
-        <div className="bg-gradient-to-r from-blue-500 to-teal-500 rounded-lg p-6 text-white mb-6 text-center">
-          <div className="w-20 h-20 bg-white rounded-full mx-auto mb-3 flex items-center justify-center text-3xl font-bold text-blue-600 overflow-hidden">
+        {/* Profile Header - Pokémon Go Style */}
+        <div className="bg-gradient-to-br from-red-500 via-yellow-400 to-orange-500 rounded-3xl p-8 text-white mb-6 text-center shadow-2xl border-4 border-yellow-300">
+          <div className="w-24 h-24 bg-white bg-opacity-20 backdrop-blur-sm rounded-full mx-auto mb-4 flex items-center justify-center text-4xl font-black overflow-hidden border-4 border-white">
             {user?.profile_image ? (
               <img src={user.profile_image} alt={user.nickname} className="w-full h-full object-cover" />
             ) : (
               user?.nickname?.[0] || "?"
             )}
           </div>
-          <h1 className="text-2xl font-bold">{user?.nickname || "사용자"}</h1>
-          <p className="text-sm opacity-90">{user?.email}</p>
+          <h1 className="text-3xl font-black uppercase tracking-wider">{user?.nickname || "플레이어"}</h1>
+          <p className="text-sm opacity-90 font-bold">{user?.email}</p>
+          {user?.is_admin && (
+            <div className="flex items-center justify-center gap-2 mt-2 bg-black bg-opacity-30 rounded-full py-1 px-3 w-fit mx-auto">
+              <ShieldCheck size={16} />
+              <span className="text-xs font-bold">관리자</span>
+            </div>
+          )}
         </div>
 
         {/* User Stats */}
         <div className="grid grid-cols-3 gap-3 mb-6">
-          <div className="bg-blue-50 rounded-lg p-3 text-center border border-blue-200">
-            <Zap className="mx-auto text-blue-600 mb-1" size={20} />
-            <p className="text-[10px] text-gray-600">포인트</p>
-            <p className="text-lg font-bold text-gray-900">{user?.points?.toLocaleString() ?? 0}</p>
+          <div className="bg-gradient-to-br from-red-400 to-red-600 rounded-2xl p-4 text-center border-4 border-red-500 shadow-lg text-white">
+            <Zap className="mx-auto text-red-100 mb-2" size={24} />
+            <p className="text-xs font-black uppercase">포인트</p>
+            <p className="text-2xl font-black">{user?.points?.toLocaleString() ?? 0}</p>
           </div>
-          <div className="bg-purple-50 rounded-lg p-3 text-center border border-purple-200">
-            <Award className="mx-auto text-purple-600 mb-1" size={20} />
-            <p className="text-[10px] text-gray-600">레벨</p>
-            <p className="text-lg font-bold text-gray-900">{Math.floor((user?.points ?? 0) / 100) + 1}</p>
+          <div className="bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl p-4 text-center border-4 border-blue-500 shadow-lg text-white">
+            <Award className="mx-auto text-blue-100 mb-2" size={24} />
+            <p className="text-xs font-black uppercase">레벨</p>
+            <p className="text-2xl font-black">{Math.floor((user?.points ?? 0) / 100) + 1}</p>
           </div>
-          <div className="bg-green-50 rounded-lg p-3 text-center border border-green-200">
-            <Calendar className="mx-auto text-green-600 mb-1" size={20} />
-            <p className="text-[10px] text-gray-600">가입 일수</p>
-            <p className="text-lg font-bold text-gray-900">{joinDays}</p>
+          <div className="bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-2xl p-4 text-center border-4 border-yellow-500 shadow-lg text-white">
+            <Calendar className="mx-auto text-yellow-100 mb-2" size={24} />
+            <p className="text-xs font-black uppercase">일수</p>
+            <p className="text-2xl font-black">{joinDays}</p>
           </div>
         </div>
 
         {/* Activity Stats */}
         <div className="mb-6">
-          <h2 className="text-lg font-bold text-gray-900 mb-3">활동 통계</h2>
+          <h2 className="text-2xl font-black text-gray-900 mb-4 uppercase">📊 활동</h2>
           <div className="space-y-3">
             <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg border border-gray-200">
               <span className="text-sm font-semibold text-gray-900">생물 목격</span>
