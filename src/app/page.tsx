@@ -2,17 +2,24 @@
 
 import MainLayout from "@/components/MainLayout";
 import PokemonHeader from "@/components/PokemonHeader";
-import { Zap, TrendingUp, Trophy } from "lucide-react";
+import { Zap, TrendingUp, Trophy, Award, MapPin, Clock, CheckCircle2, Hourglass } from "lucide-react";
 import { useUserDetail } from "@/hooks/useUser";
 import { useSightings } from "@/hooks/useSightings";
 import { useCollectionStats } from "@/hooks/useCollection";
 import { usePointsRanking } from "@/hooks/useRankings";
+import { useMyBadges } from "@/hooks/useBadges";
+import Image from "next/image";
+import { getCreatureById } from "@/data/creatures";
 
 export default function HomePage() {
   const { data: user } = useUserDetail();
   const { data: sightingsData } = useSightings({ limit: 3 });
   const { data: stats } = useCollectionStats();
   const { data: rankingsData } = usePointsRanking();
+  const { data: myBadges } = useMyBadges();
+
+  const getBadgeImage = (name: string) =>
+    `/badges/${encodeURIComponent(name.trim())}.png`;
 
   return (
     <MainLayout>
@@ -58,25 +65,101 @@ export default function HomePage() {
           </div>
         </div>
 
+        {/* My Badges */}
+        <div>
+          <h2 className="text-lg font-bold text-gray-900 mb-3">🏅 내 뱃지</h2>
+          {myBadges?.badges?.length ? (
+            <div className="grid grid-cols-3 gap-3">
+              {myBadges.badges.map((item, idx) => (
+                <div
+                  key={idx}
+                  className="rounded-lg p-3 bg-gray-50 flex flex-col items-center gap-2"
+                >
+                  {item.badge?.name || item.badge?.name_ko ? (
+                    <Image
+                      src={getBadgeImage(item.badge.name_ko || item.badge.name)}
+                      alt={item.badge.name_ko || item.badge.name}
+                      width={72}
+                      height={72}
+                      className="rounded-lg object-contain"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500">
+                      <Award size={20} />
+                    </div>
+                  )}
+                  <p className="text-sm font-semibold text-center text-gray-900 leading-tight">
+                    {item.badge.name_ko || item.badge.name}
+                  </p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-center text-gray-500 text-sm py-4 bg-gray-50 rounded-lg border border-gray-200">
+              아직 획득한 뱃지가 없습니다.
+            </p>
+          )}
+        </div>
+
         {/* Recent Feed */}
         <div>
           <h2 className="text-lg font-bold text-gray-900 mb-3">최근 활동</h2>
           <div className="space-y-3">
             {sightingsData?.sightings?.map(sighting => (
-              <div key={sighting.id} className="bg-gray-50 rounded-lg p-3 border border-gray-200">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-teal-400 rounded-full flex items-center justify-center text-white font-bold overflow-hidden">
-                    {sighting.user_nickname?.[0] || "?"}
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-semibold text-sm text-gray-900">{sighting.user_nickname || "익명"}</p>
-                    <p className="text-xs text-gray-600">
-                      {sighting.creature_name ? `${sighting.creature_name} 발견!` : "새로운 생물 탐색 중"}
+              <div key={sighting.id} className="bg-gray-50 rounded-lg p-3 border border-gray-200 flex gap-3">
+                <div className="w-16 h-16 rounded-lg overflow-hidden bg-white border border-gray-100 flex-shrink-0">
+                  {sighting.photo_url ? (
+                    <img
+                      src={sighting.photo_url}
+                      alt={sighting.memo || "목격"}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = "/file.svg";
+                      }}
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">사진 없음</div>
+                  )}
+                </div>
+                <div className="flex-1 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-semibold text-gray-900">
+                      {sighting.memo || "메모 없음"}
                     </p>
+                    <span className="text-[11px] text-gray-500 flex items-center gap-1">
+                      <Clock size={12} />
+                      {new Date(sighting.created_at).toLocaleDateString()}
+                    </span>
                   </div>
-                  <span className="text-xs text-gray-500">
-                    {new Date(sighting.created_at).toLocaleDateString()}
-                  </span>
+                  <p className="text-xs text-gray-600 flex items-center gap-1">
+                    <MapPin size={12} className="text-gray-400" />
+                    {sighting.location_name || "위치 미기입"}
+                  </p>
+                  <p className="text-xs text-gray-700">
+                    {sighting.creature_id
+                      ? `${getCreatureById(sighting.creature_id)?.name || "미확인"} 발견!`
+                      : sighting.ai_suggestion
+                        ? `AI 제안: ${sighting.ai_suggestion}`
+                        : "AI 분석 대기"}
+                  </p>
+                  <div className="flex items-center gap-2 text-[11px]">
+                    <span
+                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full ${
+                        sighting.status === "approved"
+                          ? "bg-green-100 text-green-700"
+                          : sighting.status === "pending"
+                            ? "bg-amber-100 text-amber-700"
+                            : "bg-red-100 text-red-700"
+                      }`}
+                    >
+                      {sighting.status === "approved" ? <CheckCircle2 size={12} /> : <Hourglass size={12} />}
+                      {sighting.status === "approved" ? "승인됨" : sighting.status === "pending" ? "검수중" : "거절"}
+                    </span>
+                    {typeof sighting.points_earned === "number" && sighting.points_earned > 0 && (
+                      <span className="text-blue-600 font-semibold">+{sighting.points_earned}p</span>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
