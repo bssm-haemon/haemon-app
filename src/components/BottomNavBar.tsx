@@ -20,8 +20,8 @@ export default function BottomNavBar() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-40">
-      <div className="flex justify-around items-center h-16 max-w-screen-sm mx-auto">
+    <nav className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-gray-900 to-gray-800 border-t-4 border-yellow-400 z-40 shadow-2xl">
+      <div className="flex justify-around items-center h-20 max-w-screen-sm mx-auto">
         {navItems.map(item => {
           const Icon = item.icon;
           const isActive = pathname === item.href;
@@ -31,12 +31,12 @@ export default function BottomNavBar() {
               key={item.href}
               href={item.href}
               className={clsx(
-                "flex flex-col items-center justify-center w-full h-full transition-colors",
-                isActive ? "text-blue-600 border-t-2 border-blue-600" : "text-gray-500 hover:text-gray-700",
+                "flex flex-col items-center justify-center w-full h-full transition-all transform hover:scale-110",
+                isActive ? "text-yellow-400 border-t-4 border-yellow-400 -mt-4" : "text-gray-300 hover:text-yellow-300",
               )}
             >
-              <Icon size={24} />
-              <span className="text-xs mt-1 font-medium">{item.label}</span>
+              <Icon size={28} className="font-bold" />
+              <span className="text-xs mt-1 font-black uppercase tracking-wide">{item.label}</span>
             </Link>
           );
         })}
