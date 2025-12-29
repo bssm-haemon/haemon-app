@@ -106,60 +106,43 @@ export default function HomePage() {
           <h2 className="text-lg font-bold text-gray-900 mb-3">최근 활동</h2>
           <div className="space-y-3">
             {sightingsData?.sightings?.map(sighting => (
-              <div key={sighting.id} className="bg-gray-50 rounded-lg p-3 border border-gray-200 flex gap-3">
-                <div className="w-16 h-16 rounded-lg overflow-hidden bg-white border border-gray-100 flex-shrink-0">
-                  {sighting.photo_url ? (
-                    <img
-                      src={sighting.photo_url}
-                      alt={sighting.memo || "목격"}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.currentTarget.onerror = null;
-                        e.currentTarget.src = "/file.svg";
-                      }}
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">사진 없음</div>
-                  )}
+              <div key={sighting.id} className="bg-gray-50 rounded-lg p-3 border border-gray-200 space-y-2">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-semibold text-gray-900">
+                    {sighting.memo || "메모 없음"}
+                  </p>
+                  <span className="text-[11px] text-gray-500 flex items-center gap-1">
+                    <Clock size={12} />
+                    {new Date(sighting.created_at).toLocaleDateString()}
+                  </span>
                 </div>
-                <div className="flex-1 space-y-1">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-semibold text-gray-900">
-                      {sighting.memo || "메모 없음"}
-                    </p>
-                    <span className="text-[11px] text-gray-500 flex items-center gap-1">
-                      <Clock size={12} />
-                      {new Date(sighting.created_at).toLocaleDateString()}
-                    </span>
-                  </div>
-                  <p className="text-xs text-gray-600 flex items-center gap-1">
-                    <MapPin size={12} className="text-gray-400" />
-                    {sighting.location_name || "위치 미기입"}
-                  </p>
-                  <p className="text-xs text-gray-700">
-                    {sighting.creature_id
-                      ? `${getCreatureById(sighting.creature_id)?.name || "미확인"} 발견!`
-                      : sighting.ai_suggestion
-                        ? `AI 제안: ${sighting.ai_suggestion}`
-                        : "AI 분석 대기"}
-                  </p>
-                  <div className="flex items-center gap-2 text-[11px]">
-                    <span
-                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full ${
-                        sighting.status === "approved"
-                          ? "bg-green-100 text-green-700"
-                          : sighting.status === "pending"
-                            ? "bg-amber-100 text-amber-700"
-                            : "bg-red-100 text-red-700"
-                      }`}
-                    >
-                      {sighting.status === "approved" ? <CheckCircle2 size={12} /> : <Hourglass size={12} />}
-                      {sighting.status === "approved" ? "승인됨" : sighting.status === "pending" ? "검수중" : "거절"}
-                    </span>
-                    {typeof sighting.points_earned === "number" && sighting.points_earned > 0 && (
-                      <span className="text-blue-600 font-semibold">+{sighting.points_earned}p</span>
-                    )}
-                  </div>
+                <p className="text-xs text-gray-600 flex items-center gap-1">
+                  <MapPin size={12} className="text-gray-400" />
+                  {sighting.location_name || "위치 미기입"}
+                </p>
+                <p className="text-xs text-gray-700">
+                  {sighting.creature_id
+                    ? `${getCreatureById(sighting.creature_id)?.name || "미확인"} 발견!`
+                    : sighting.ai_suggestion
+                      ? `AI 제안: ${sighting.ai_suggestion}`
+                      : "AI 분석 대기"}
+                </p>
+                <div className="flex items-center gap-2 text-[11px]">
+                  <span
+                    className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full ${
+                      sighting.status === "approved"
+                        ? "bg-green-100 text-green-700"
+                        : sighting.status === "pending"
+                          ? "bg-amber-100 text-amber-700"
+                          : "bg-red-100 text-red-700"
+                    }`}
+                  >
+                    {sighting.status === "approved" ? <CheckCircle2 size={12} /> : <Hourglass size={12} />}
+                    {sighting.status === "approved" ? "승인됨" : sighting.status === "pending" ? "검수중" : "거절"}
+                  </span>
+                  {typeof sighting.points_earned === "number" && sighting.points_earned > 0 && (
+                    <span className="text-blue-600 font-semibold">+{sighting.points_earned}p</span>
+                  )}
                 </div>
               </div>
             ))}
