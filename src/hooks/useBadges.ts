@@ -12,13 +12,14 @@ interface MyBadgesResponse {
     total: number;
 }
 
-export const useAllBadges = () => {
+export const useAllBadges = (options?: { enabled?: boolean }) => {
     return useQuery<BadgesResponse>({
         queryKey: ["badges"],
         queryFn: async () => {
             const { data } = await apiClient.get("/badges");
             return data;
         },
+        enabled: options?.enabled,
     });
 };
 
@@ -28,19 +29,6 @@ export const useMyBadges = () => {
         queryFn: async () => {
             const { data } = await apiClient.get("/badges/my");
             return data;
-        },
-    });
-};
-
-export const useCreateBadge = () => {
-    const queryClient = useQueryClient();
-    return useMutation({
-        mutationFn: async (badge: Partial<Badge>) => {
-            const { data } = await apiClient.post("/badges", badge);
-            return data;
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["badges"] });
         },
     });
 };

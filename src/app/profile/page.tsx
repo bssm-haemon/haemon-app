@@ -6,6 +6,7 @@ import { useUserDetail } from "@/hooks/useUser";
 import { useLogout } from "@/hooks/useAuth";
 import { useMyBadges } from "@/hooks/useBadges";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function ProfilePage() {
   const { data: user } = useUserDetail();
@@ -24,6 +25,8 @@ export default function ProfilePage() {
   const joinDays = user?.created_at
     ? Math.floor((new Date().getTime() - new Date(user.created_at).getTime()) / (1000 * 60 * 60 * 24))
     : 0;
+
+  const getBadgeImage = (name: string) => `/badges/${encodeURIComponent(name.trim())}.png`;
 
   return (
     <MainLayout>
@@ -85,9 +88,23 @@ export default function ProfilePage() {
           {badgesData?.badges && badgesData.badges.length > 0 ? (
             <div className="grid grid-cols-4 gap-2">
               {badgesData.badges.map((item, idx) => (
-                <div key={idx} className="flex flex-col items-center p-2 bg-gray-50 rounded-lg border border-gray-200">
-                  <img src={item.badge.icon_url} alt={item.badge.name} className="w-8 h-8 mb-1" />
-                  <span className="text-[10px] font-semibold text-center text-gray-900">{item.badge.name}</span>
+                <div key={idx} className="flex flex-col items-center gap-2">
+                  {item.badge?.name || item.badge?.name_ko ? (
+                    <Image
+                      src={getBadgeImage(item.badge.name_ko || item.badge.name)}
+                      alt={item.badge.name_ko || item.badge.name}
+                      width={72}
+                      height={72}
+                      className="rounded-lg object-contain"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500">
+                      <Award size={20} />
+                    </div>
+                  )}
+                  <span className="text-[11px] font-semibold text-center text-gray-900 leading-tight">
+                    {item.badge.name_ko || item.badge.name}
+                  </span>
                 </div>
               ))}
             </div>
