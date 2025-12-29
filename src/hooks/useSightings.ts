@@ -9,13 +9,17 @@ interface SightingsResponse {
   limit: number;
 }
 
-export const useSightings = (params?: { page?: number; limit?: number; status?: string; user_id?: string }) => {
+export const useSightings = (
+  params?: { page?: number; limit?: number; status?: string; user_id?: string },
+  options?: { enabled?: boolean },
+) => {
   return useQuery<SightingsResponse>({
     queryKey: ["sightings", params],
     queryFn: async () => {
       const { data } = await apiClient.get("/sightings", { params });
       return data;
     },
+    enabled: options?.enabled,
   });
 };
 

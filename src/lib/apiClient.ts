@@ -9,11 +9,13 @@ export const apiClient = axios.create({
   },
 });
 
-// Request interceptor (토큰 추가 가능)
 apiClient.interceptors.request.use(config => {
-  const token = localStorage.getItem("token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+  // Guard for SSR/Next.js server renders
+  if (typeof window !== "undefined") {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
   }
   return config;
 });
@@ -22,8 +24,9 @@ apiClient.interceptors.request.use(config => {
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    // 디버깅을 위해 전체 에러 출력
-    console.error("API Error:", error.response?.data);
+    // 디버깅 로그 (응답이 없을 때도 메시지 출력)
+    const payload = error.response?.data ?? error.message;
+    console.error("API Error:", payload);
 
     const detail = error.response?.data?.detail;
     if (detail) {

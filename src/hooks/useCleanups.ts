@@ -9,13 +9,17 @@ interface CleanupsResponse {
   limit: number;
 }
 
-export const useCleanups = (params?: { page?: number; limit?: number; status?: string; user_id?: string; trash_type?: string }) => {
+export const useCleanups = (
+  params?: { page?: number; limit?: number; status?: string; user_id?: string; trash_type?: string },
+  options?: { enabled?: boolean },
+) => {
   return useQuery<CleanupsResponse>({
     queryKey: ["cleanups", params],
     queryFn: async () => {
       const { data } = await apiClient.get("/cleanups", { params });
       return data;
     },
+    enabled: options?.enabled,
   });
 };
 
