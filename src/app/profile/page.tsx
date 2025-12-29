@@ -1,7 +1,7 @@
 "use client";
 
 import MainLayout from "@/components/MainLayout";
-import { Award, Calendar, Zap, Settings, LogOut } from "lucide-react";
+import { Award, Calendar, Zap, Settings, LogOut, ShieldCheck } from "lucide-react";
 import { useUserDetail } from "@/hooks/useUser";
 import { useLogout } from "@/hooks/useAuth";
 import { useMyBadges } from "@/hooks/useBadges";
@@ -107,6 +107,18 @@ export default function ProfilePage() {
             </div>
             <span className="text-gray-400">›</span>
           </button>
+          {user?.is_admin && (
+            <button
+              onClick={() => router.push("/admin")}
+              className="w-full flex items-center justify-between p-4 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <ShieldCheck size={20} className="text-blue-600" />
+                <span className="font-semibold text-blue-700">관리자 콘솔</span>
+              </div>
+              <span className="text-blue-400">›</span>
+            </button>
+          )}
           <button
             onClick={handleLogout}
             className="w-full flex items-center justify-between p-4 bg-red-50 hover:bg-red-100 rounded-lg border border-red-200 transition-colors"

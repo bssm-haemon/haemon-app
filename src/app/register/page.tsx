@@ -28,6 +28,7 @@ export default function RegisterPage() {
 
   // States for Creature
   const [creaturePhoto, setCreaturePhoto] = useState<File | null>(null);
+  const [creaturePhotoPreview, setCreaturePhotoPreview] = useState<string>("");
   const [creatureId, setCreatureId] = useState("");
   const [memo, setMemo] = useState("");
   const [aiSuggestion, setAiSuggestion] = useState<string>("");
@@ -35,7 +36,9 @@ export default function RegisterPage() {
 
   // States for Cleanup
   const [beforePhoto, setBeforePhoto] = useState<File | null>(null);
+  const [beforePhotoPreview, setBeforePhotoPreview] = useState<string>("");
   const [afterPhoto, setAfterPhoto] = useState<File | null>(null);
+  const [afterPhotoPreview, setAfterPhotoPreview] = useState<string>("");
   const [trashType, setTrashType] = useState<TrashType>("plastic");
   const [amount, setAmount] = useState<CleanupAmount>("one_bag");
   const [trashAiVerified, setTrashAiVerified] = useState(false);
@@ -47,20 +50,44 @@ export default function RegisterPage() {
   const classifyTrash = useAIClassifyTrash();
 
   const onCreaturePhotoChange = async (file: File | null) => {
+    // 이전 미리보기 URL 정리
+    if (creaturePhotoPreview) {
+      URL.revokeObjectURL(creaturePhotoPreview);
+    }
+
     setCreaturePhoto(file);
+
     if (file) {
+      // 새로운 미리보기 URL 생성
+      const previewUrl = URL.createObjectURL(file);
+      setCreaturePhotoPreview(previewUrl);
+
+      // AI 분석
       classifyCreature.mutate(file, {
         onSuccess: (data) => {
           setAiSuggestion(data.suggested_creature);
           setAiConfidence(data.confidence);
         }
       });
+    } else {
+      setCreaturePhotoPreview("");
     }
   };
 
   const onBeforePhotoChange = async (file: File | null) => {
+    // 이전 미리보기 URL 정리
+    if (beforePhotoPreview) {
+      URL.revokeObjectURL(beforePhotoPreview);
+    }
+
     setBeforePhoto(file);
+
     if (file) {
+      // 새로운 미리보기 URL 생성
+      const previewUrl = URL.createObjectURL(file);
+      setBeforePhotoPreview(previewUrl);
+
+      // AI 분석
       classifyTrash.mutate(file, {
         onSuccess: (data) => {
           setTrashType(data.trash_type);
@@ -68,8 +95,35 @@ export default function RegisterPage() {
           setTrashAiConfidence(data.confidence);
         }
       });
+    } else {
+      setBeforePhotoPreview("");
     }
   };
+
+  const onAfterPhotoChange = (file: File | null) => {
+    // 이전 미리보기 URL 정리
+    if (afterPhotoPreview) {
+      URL.revokeObjectURL(afterPhotoPreview);
+    }
+
+    setAfterPhoto(file);
+
+    if (file) {
+      const previewUrl = URL.createObjectURL(file);
+      setAfterPhotoPreview(previewUrl);
+    } else {
+      setAfterPhotoPreview("");
+    }
+  };
+
+  // 컴포넌트 언마운트 시 모든 blob URL 정리
+  useEffect(() => {
+    return () => {
+      if (creaturePhotoPreview) URL.revokeObjectURL(creaturePhotoPreview);
+      if (beforePhotoPreview) URL.revokeObjectURL(beforePhotoPreview);
+      if (afterPhotoPreview) URL.revokeObjectURL(afterPhotoPreview);
+    };
+  }, [creaturePhotoPreview, beforePhotoPreview, afterPhotoPreview]);
 
   const handleCreatureSubmit = async () => {
     if (!creaturePhoto || !coords) return alert("사진과 위치 정보가 필요합니다.");
@@ -155,8 +209,8 @@ export default function RegisterPage() {
                 id="creatureInput"
               />
               <label htmlFor="creatureInput" className="block border-2 border-dashed border-gray-300 rounded-2xl p-6 text-center hover:border-blue-500 transition-all cursor-pointer aspect-video flex flex-col items-center justify-center overflow-hidden bg-gray-50">
-                {creaturePhoto ? (
-                  <img src={URL.createObjectURL(creaturePhoto)} className="w-full h-full object-cover" />
+                {creaturePhotoPreview ? (
+                  <img src={creaturePhotoPreview} className="w-full h-full object-cover" alt="미리보기" />
                 ) : (
                   <>
                     <Camera className="mx-auto mb-2 text-gray-400" size={40} />
@@ -223,8 +277,8 @@ export default function RegisterPage() {
               <div className="relative">
                 <input type="file" accept="image/*" onChange={(e) => onBeforePhotoChange(e.target.files?.[0] || null)} className="hidden" id="beforeInput" />
                 <label htmlFor="beforeInput" className="border-2 border-dashed border-gray-300 rounded-2xl p-4 text-center hover:border-green-500 cursor-pointer aspect-square flex flex-col items-center justify-center overflow-hidden bg-gray-50 transition-all">
-                  {beforePhoto ? (
-                    <img src={URL.createObjectURL(beforePhoto)} className="w-full h-full object-cover" />
+                  {beforePhotoPreview ? (
+                    <img src={beforePhotoPreview} className="w-full h-full object-cover" alt="수거 전" />
                   ) : (
                     <>
                       <Camera className="mx-auto mb-1 text-gray-400" size={28} />
@@ -240,10 +294,10 @@ export default function RegisterPage() {
                 )}
               </div>
 
-              <input type="file" accept="image/*" onChange={(e) => setAfterPhoto(e.target.files?.[0] || null)} className="hidden" id="afterInput" />
+              <input type="file" accept="image/*" onChange={(e) => onAfterPhotoChange(e.target.files?.[0] || null)} className="hidden" id="afterInput" />
               <label htmlFor="afterInput" className="border-2 border-dashed border-gray-300 rounded-2xl p-4 text-center hover:border-green-500 cursor-pointer aspect-square flex flex-col items-center justify-center overflow-hidden bg-gray-50 transition-all">
-                {afterPhoto ? (
-                  <img src={URL.createObjectURL(afterPhoto)} className="w-full h-full object-cover" />
+                {afterPhotoPreview ? (
+                  <img src={afterPhotoPreview} className="w-full h-full object-cover" alt="수거 후" />
                 ) : (
                   <>
                     <Camera className="mx-auto mb-1 text-gray-400" size={28} />
@@ -307,18 +361,6 @@ export default function RegisterPage() {
         )}
       </div>
 
-      <style jsx>{`
-        @keyframes fade-in {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        @keyframes slide-up {
-          from { transform: translateY(10px); opacity: 0; }
-          to { transform: translateY(0); opacity: 1; }
-        }
-        .animate-fade-in { animation: fade-in 0.3s ease-out; }
-        .animate-slide-up { animation: slide-up 0.4s ease-out; }
-      `}</style>
     </MainLayout>
   );
 }
