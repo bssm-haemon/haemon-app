@@ -1,13 +1,28 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import apiClient from "@/lib/apiClient";
 import { User } from "@/types";
 
-export const useUser = () => {
+export const useUserDetail = () => {
   return useQuery<User>({
-    queryKey: ["user"],
+    queryKey: ["user-me"],
     queryFn: async () => {
       const { data } = await apiClient.get("/users/me");
       return data;
+    },
+    enabled: typeof window !== 'undefined' && !!localStorage.getItem("token"),
+  });
+};
+
+export const useUpdateProfile = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: { nickname?: string; profile_image?: string }) => {
+      const { data } = await apiClient.patch("/users/me", payload);
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user-me"] });
+      queryClient.invalidateQueries({ queryKey: ["auth-me"] });
     },
   });
 };
