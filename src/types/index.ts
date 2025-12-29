@@ -3,66 +3,103 @@ export interface User {
   id: string;
   email: string;
   nickname: string;
+  profile_image: string;
   points: number;
-  level: number;
-  achievements: Achievement[];
-  createdAt: string;
+  is_admin: boolean;
+  created_at: string;
+  sighting_count?: number;
+  cleanup_count?: number;
+  creature_count?: number;
+  badge_count?: number;
 }
 
 // Creature (생물)
+export type CreatureCategory = 'cetacean' | 'turtle' | 'pinniped' | 'fish' | 'jellyfish' | 'crustacean' | 'mollusk' | 'bird';
+export type Rarity = 'common' | 'rare' | 'legendary';
+
 export interface Creature {
   id: string;
   name: string;
-  rarity: "common" | "rare" | "legend";
-  imageUrl: string;
-  description?: string;
+  name_en: string;
+  category: CreatureCategory;
+  description: string;
+  image_url: string;
+  rarity: Rarity;
+  points: number;
+  created_at: string;
 }
 
 // Sighting (목격 기록)
 export interface Sighting {
   id: string;
-  userId: string;
-  creatureId: string;
-  creature?: Creature;
-  photoUrl: string;
-  lat: number;
-  lng: number;
+  user_id: string;
+  creature_id: string | null;
+  photo_url: string;
+  latitude: number;
+  longitude: number;
+  location_name?: string;
   memo?: string;
+  image_hash: string;
+  ai_suggestion?: string;
+  ai_confidence?: number;
   status: "pending" | "approved" | "rejected";
-  points: number;
-  createdAt: string;
+  points_earned: number;
+  created_at: string;
+  user_nickname?: string;
+  creature_name?: string;
 }
 
 // Cleanup (쓰레기 수거)
+export type TrashType = 'plastic' | 'styrofoam' | 'fishing_gear' | 'glass' | 'metal' | 'other';
+export type CleanupAmount = 'handful' | 'one_bag' | 'large';
+
 export interface Cleanup {
   id: string;
-  userId: string;
-  beforePhoto: string;
-  afterPhoto: string;
-  trashType: string;
-  amount: number;
-  lat: number;
-  lng: number;
-  points: number;
+  user_id: string;
+  before_photo_url: string;
+  after_photo_url: string;
+  latitude: number;
+  longitude: number;
+  location_name?: string;
+  trash_type: TrashType;
+  amount: CleanupAmount;
+  before_image_hash: string;
+  after_image_hash: string;
+  ai_verified: boolean;
+  ai_confidence: number;
   status: "pending" | "approved" | "rejected";
-  createdAt: string;
+  points_earned: number;
+  created_at: string;
 }
 
-// Achievement (업적/뱃지)
-export interface Achievement {
+// Badge (뱃지)
+export interface Badge {
   id: string;
   name: string;
   description: string;
-  iconUrl: string;
-  unlockedAt?: string;
+  icon_url: string;
+  condition_type: string;
+  condition_value: number;
+  created_at: string;
 }
 
-// Feed Item
-export interface FeedItem {
-  id: string;
-  type: "sighting" | "cleanup";
-  userId: string;
-  userNickname: string;
-  content: Sighting | Cleanup;
-  createdAt: string;
+export interface MyBadge {
+  badge: Badge;
+  earned_at: string;
+}
+
+// Collection
+export interface CollectionItem {
+  creature: Creature;
+  discovered_at: string;
+  first_sighting_id: string;
+}
+
+// Ranking
+export interface RankingItem {
+  rank: number;
+  user_id: string;
+  nickname: string;
+  profile_image: string;
+  value: number;
 }

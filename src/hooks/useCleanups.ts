@@ -1,12 +1,19 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import apiClient from "@/lib/apiClient";
 import { Cleanup } from "@/types";
 
-export const useCleanups = () => {
-  return useQuery<Cleanup[]>({
-    queryKey: ["cleanups"],
+interface CleanupsResponse {
+  cleanups: Cleanup[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export const useCleanups = (params?: { page?: number; limit?: number; status?: string; user_id?: string; trash_type?: string }) => {
+  return useQuery<CleanupsResponse>({
+    queryKey: ["cleanups", params],
     queryFn: async () => {
-      const { data } = await apiClient.get("/cleanups");
+      const { data } = await apiClient.get("/cleanups", { params });
       return data;
     },
   });
@@ -20,5 +27,50 @@ export const useCleanupDetail = (id: string) => {
       return data;
     },
     enabled: !!id,
+  });
+};
+
+export const useCreateCleanup = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (formData: FormData) => {
+      const { data } = await apiClient.post("/cleanups", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cleanups"] });
+    },
+  });
+};
+
+export const useApproveCleanup = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { data } = await apiClient.patch(`/cleanups/${id}/approve`);
+      return data;
+    },
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: ["cleanups"] });
+      queryClient.invalidateQueries({ queryKey: ["cleanups", id] });
+    },
+  });
+};
+
+export const useRejectCleanup = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { data } = await apiClient.patch(`/cleanups/${id}/reject`);
+      return data;
+    },
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: ["cleanups"] });
+      queryClient.invalidateQueries({ queryKey: ["cleanups", id] });
+    },
   });
 };
