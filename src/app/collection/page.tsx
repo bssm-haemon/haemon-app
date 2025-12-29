@@ -2,64 +2,41 @@
 
 import MainLayout from "@/components/MainLayout";
 import { useState } from "react";
-import { Filter, X } from "lucide-react";
+import { Filter } from "lucide-react";
 import clsx from "clsx";
-
-interface CollectionCard {
-  id: string;
-  name: string;
-  rarity: "common" | "rare" | "legend";
-  image: string;
-  discovered: boolean;
-}
-
-const creatures: CollectionCard[] = [
-  { id: "1", name: "해파리", rarity: "common", image: "🪼", discovered: true },
-  { id: "2", name: "불가사리", rarity: "common", image: "⭐", discovered: true },
-  { id: "3", name: "문어", rarity: "rare", image: "🐙", discovered: true },
-  { id: "4", name: "거북이", rarity: "rare", image: "🐢", discovered: false },
-  { id: "5", name: "돌고래", rarity: "legend", image: "🐬", discovered: false },
-  { id: "6", name: "산호", rarity: "common", image: "🪸", discovered: false },
-  { id: "7", name: "나팔고둥", rarity: "common", image: "🐚", discovered: false },
-  { id: "8", name: "해마", rarity: "rare", image: "🐴", discovered: false },
-  { id: "9", name: "고래", rarity: "legend", image: "🐋", discovered: false },
-  { id: "10", name: "가재", rarity: "common", image: "🦞", discovered: false },
-  { id: "11", name: "게", rarity: "common", image: "🦀", discovered: false },
-  { id: "12", name: "상어", rarity: "legend", image: "🦈", discovered: false },
-];
+import PokemonHeader from "@/components/PokemonHeader";
+import { useCreatures } from "@/hooks/useCreatures";
+import { useCollection, useCollectionStats } from "@/hooks/useCollection";
+import { Rarity } from "@/types";
 
 export default function CollectionPage() {
-  const [filter, setFilter] = useState<"all" | "common" | "rare" | "legend">("all");
+  const [filter, setFilter] = useState<"all" | Rarity>("all");
   const [showFilter, setShowFilter] = useState(false);
+
+  const { data: creaturesData } = useCreatures(filter !== "all" ? { rarity: filter } : {});
+  const { data: collectionData } = useCollection();
+  const { data: stats } = useCollectionStats();
 
   const rarityColors = {
     common: { bg: "bg-blue-50", border: "border-blue-200", badge: "bg-blue-100 text-blue-800" },
     rare: { bg: "bg-purple-50", border: "border-purple-200", badge: "bg-purple-100 text-purple-800" },
-    legend: { bg: "bg-yellow-50", border: "border-yellow-200", badge: "bg-yellow-100 text-yellow-800" },
+    legendary: { bg: "bg-yellow-50", border: "border-yellow-200", badge: "bg-yellow-100 text-yellow-800" },
   };
 
   const rarityLabels = {
     common: "일반",
     rare: "희귀",
-    legend: "전설",
+    legendary: "전설",
   };
 
-  const filtered = creatures.filter(c => filter === "all" || c.rarity === filter);
-  const discovered = filtered.filter(c => c.discovered).length;
+  const isDiscovered = (creatureId: string) => {
+    return collectionData?.collection.some(item => item.creature.id === creatureId);
+  };
 
   return (
     <MainLayout>
       <div className="p-4">
-        {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">도감</h1>
-          <p className="text-sm text-gray-600">
-            발견한 생물:{" "}
-            <span className="font-bold">
-              {discovered}/{filtered.length}
-            </span>
-          </p>
-        </div>
+        <PokemonHeader className="mb-4" />
 
         {/* Filter Controls */}
         <div className="mb-4">
@@ -74,7 +51,7 @@ export default function CollectionPage() {
           {showFilter && (
             <div className="mt-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
               <div className="flex flex-wrap gap-2">
-                {(["all", "common", "rare", "legend"] as const).map(rarity => (
+                {(["all", "common", "rare", "legendary"] as const).map(rarity => (
                   <button
                     key={rarity}
                     onClick={() => setFilter(rarity)}
@@ -85,7 +62,7 @@ export default function CollectionPage() {
                         : "bg-white text-gray-700 border border-gray-300 hover:border-gray-400",
                     )}
                   >
-                    {rarity === "all" ? "전체" : rarityLabels[rarity]}
+                    {rarity === "all" ? "전체" : rarityLabels[rarity as Rarity]}
                   </button>
                 ))}
               </div>
@@ -95,29 +72,30 @@ export default function CollectionPage() {
 
         {/* Collection Grid */}
         <div className="grid grid-cols-3 gap-3">
-          {filtered.map(creature => {
+          {creaturesData?.creatures.map(creature => {
+            const discovered = isDiscovered(creature.id);
             const colors = rarityColors[creature.rarity];
             return (
               <div
                 key={creature.id}
                 className={clsx(
-                  "rounded-lg border-2 p-3 text-center cursor-pointer transition-transform hover:scale-105",
+                  "rounded-lg border-2 p-3 text-center cursor-pointer transition-transform hover:scale-105 aspect-square flex flex-col items-center justify-center",
                   colors.bg,
                   colors.border,
                 )}
               >
-                {creature.discovered ? (
+                {discovered ? (
                   <>
-                    <div className="text-4xl mb-2">{creature.image}</div>
-                    <p className="text-xs font-semibold text-gray-900">{creature.name}</p>
-                    <span className={clsx("inline-block mt-1 px-2 py-0.5 rounded text-xs font-bold", colors.badge)}>
+                    <img src={creature.image_url} alt={creature.name} className="w-12 h-12 object-contain mb-2" />
+                    <p className="text-[10px] font-semibold text-gray-900 truncate w-full">{creature.name}</p>
+                    <span className={clsx("inline-block mt-1 px-1.5 py-0.5 rounded text-[8px] font-bold", colors.badge)}>
                       {rarityLabels[creature.rarity]}
                     </span>
                   </>
                 ) : (
                   <>
-                    <div className="text-4xl mb-2 blur-sm opacity-30">?</div>
-                    <p className="text-xs font-semibold text-gray-400">미발견</p>
+                    <div className="text-4xl mb-2 blur-sm opacity-30 grayscale saturate-0">?</div>
+                    <p className="text-[10px] font-semibold text-gray-400">미발견</p>
                   </>
                 )}
               </div>
@@ -127,14 +105,13 @@ export default function CollectionPage() {
 
         {/* Stats */}
         <div className="mt-8 grid grid-cols-3 gap-3">
-          {(["common", "rare", "legend"] as const).map(rarity => {
-            const count = creatures.filter(c => c.rarity === rarity).length;
-            const discoveredCount = creatures.filter(c => c.rarity === rarity && c.discovered).length;
+          {(["common", "rare", "legendary"] as const).map(rarity => {
+            const stat = stats?.by_rarity?.[rarity];
             return (
               <div key={rarity} className="p-3 bg-gray-50 rounded-lg border border-gray-200 text-center">
-                <p className="text-xs text-gray-600 font-semibold">{rarityLabels[rarity]}</p>
+                <p className="text-[10px] text-gray-600 font-semibold">{rarityLabels[rarity]}</p>
                 <p className="text-lg font-bold text-gray-900 mt-1">
-                  {discoveredCount}/{count}
+                  {stat?.discovered ?? 0}/{stat?.total ?? 0}
                 </p>
               </div>
             );
