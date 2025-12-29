@@ -26,7 +26,7 @@ export interface Creature {
   image_url: string;
   rarity: Rarity;
   points: number;
-  created_at: string;
+  created_at?: string;
 }
 
 // Sighting (목격 기록)
@@ -76,11 +76,11 @@ export interface Cleanup {
 export interface Badge {
   id: string;
   name: string;
+  name_ko?: string;
   description: string;
-  icon_url: string;
   condition_type: string;
   condition_value: number;
-  created_at: string;
+  created_at?: string;
 }
 
 export interface MyBadge {
