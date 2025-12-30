@@ -104,7 +104,7 @@ export function MarketPageContent() {
             {availableItems.map((item: MarketItem) => {
               const isSelected = selectedIds.includes(item.creature_id);
               const alreadyOwned = item.in_aquarium;
-              const disabled = purchaseMutation.isPending || alreadyOwned;
+              const disabled = purchaseMutation.isPending;
               const staticCreature = getCreatureById(item.creature_id);
               const imageSrc =
                 item.image_url && item.image_url.trim().length > 0
