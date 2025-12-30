@@ -7,9 +7,10 @@ import { Camera, Trash2, MapPin, Loader2, Info } from "lucide-react";
 import clsx from "clsx";
 import { useCreateSighting } from "@/hooks/useSightings";
 import { useCreateCleanup } from "@/hooks/useCleanups";
-import { useAIClassifyCreature, useAIClassifyTrash } from "@/hooks/useAI";
+import { useAIClassifyCreature, useAIClassifyTrash, useAICheckDuplicate } from "@/hooks/useAI";
 import { TrashType, CleanupAmount } from "@/types";
 import { useRouter } from "next/navigation";
+import { AxiosError } from "axios";
 
 const RegisterPageContent = memo(() => {
   const [activeTab, setActiveTab] = useState<"creature" | "cleanup">("creature");
@@ -33,6 +34,7 @@ const RegisterPageContent = memo(() => {
   const [memo, setMemo] = useState("");
   const [aiSuggestion, setAiSuggestion] = useState<string>("");
   const [aiConfidence, setAiConfidence] = useState<number>(0);
+  const [toast, setToast] = useState<{ message: string; visible: boolean }>({ message: "", visible: false });
 
   // States for Cleanup
   const [beforePhoto, setBeforePhoto] = useState<File | null>(null);
@@ -48,6 +50,7 @@ const RegisterPageContent = memo(() => {
   const createCleanup = useCreateCleanup();
   const classifyCreature = useAIClassifyCreature();
   const classifyTrash = useAIClassifyTrash();
+  const checkDuplicate = useAICheckDuplicate();
 
   const PoketballLoader = ({ tone }: { tone: "blue" | "green" }) => (
     <div className="absolute inset-0 bg-white/70 backdrop-blur-sm rounded-2xl flex flex-col items-center justify-center animate-fade-in">
@@ -85,6 +88,11 @@ const RegisterPageContent = memo(() => {
           setAiSuggestion(data.suggested_creature);
           setAiConfidence(data.confidence);
         },
+        onError: error => {
+          const detail =
+            (error as AxiosError)?.response?.data && (error as AxiosError<{ detail?: string }>).response?.data?.detail;
+          showToast(detail || "AI 분석 중 오류가 발생했습니다.");
+        },
       });
     } else {
       setCreaturePhotoPreview("");
@@ -97,22 +105,34 @@ const RegisterPageContent = memo(() => {
       URL.revokeObjectURL(beforePhotoPreview);
     }
 
-    setBeforePhoto(file);
-
     if (file) {
-      // 새로운 미리보기 URL 생성
-      const previewUrl = URL.createObjectURL(file);
-      setBeforePhotoPreview(previewUrl);
-
-      // AI 분석
-      classifyTrash.mutate(file, {
+      checkDuplicate.mutate(file, {
         onSuccess: data => {
-          setTrashType(data.trash_type);
-          setTrashAiVerified(data.has_trash);
-          setTrashAiConfidence(data.confidence);
+          if (data.is_duplicate) {
+            showToast("중복된 사진은 안됩니다.");
+            setBeforePhoto(null);
+            setBeforePhotoPreview("");
+            return;
+          }
+          setBeforePhoto(file);
+          const previewUrl = URL.createObjectURL(file);
+          setBeforePhotoPreview(previewUrl);
+          classifyTrash.mutate(file, {
+            onSuccess: trashData => {
+              setTrashType(trashData.trash_type);
+              setTrashAiVerified(trashData.has_trash);
+              setTrashAiConfidence(trashData.confidence);
+            },
+          });
+        },
+        onError: () => {
+          showToast("사진 중복 확인 중 오류가 발생했습니다. 다시 시도해주세요.");
+          setBeforePhoto(null);
+          setBeforePhotoPreview("");
         },
       });
     } else {
+      setBeforePhoto(null);
       setBeforePhotoPreview("");
     }
   };
@@ -143,7 +163,10 @@ const RegisterPageContent = memo(() => {
   }, [creaturePhotoPreview, beforePhotoPreview, afterPhotoPreview]);
 
   const handleCreatureSubmit = async () => {
-    if (!creaturePhoto || !coords) return alert("사진과 위치 정보가 필요합니다.");
+    if (!creaturePhoto || !coords) {
+      showToast("사진과 위치 정보가 필요합니다.");
+      return;
+    }
 
     const formData = new FormData();
     formData.append("photo", creaturePhoto);
@@ -157,14 +180,22 @@ const RegisterPageContent = memo(() => {
 
     createSighting.mutate(formData, {
       onSuccess: () => {
-        alert("목격 정보가 등록되었습니다!");
+        showToast("목격 정보가 등록되었습니다!");
         router.push("/");
+      },
+      onError: error => {
+        const detail =
+          (error as AxiosError)?.response?.data && (error as AxiosError<{ detail?: string }>).response?.data?.detail;
+        showToast(detail || "목격 등록에 실패했습니다. 다시 시도해주세요.");
       },
     });
   };
 
   const handleCleanupSubmit = async () => {
-    if (!beforePhoto || !afterPhoto || !coords) return alert("사진 2장과 위치 정보가 필요합니다.");
+    if (!beforePhoto || !afterPhoto || !coords) {
+      showToast("사진 2장과 위치 정보가 필요합니다.");
+      return;
+    }
 
     const formData = new FormData();
     formData.append("before_photo", beforePhoto);
@@ -179,15 +210,33 @@ const RegisterPageContent = memo(() => {
 
     createCleanup.mutate(formData, {
       onSuccess: () => {
-        alert("수거 인증이 등록되었습니다!");
+        showToast("수거 인증이 등록되었습니다!");
         router.push("/");
+      },
+      onError: (error: unknown) => {
+        const detail =
+          (error as AxiosError)?.response?.data && (error as AxiosError<{ detail?: string }>).response?.data?.detail;
+        const message = error instanceof Error ? error.message : "";
+        if (detail?.includes("이미 등록된 사진") || message.includes("이미 등록된 사진") || message.includes("중복")) {
+          showToast("중복된 사진은 안됩니다.");
+          return;
+        }
+        showToast(detail || "수거 인증 등록에 실패했습니다. 다시 시도해주세요.");
       },
     });
   };
 
+  const showToast = (message: string) => {
+    setToast({ message, visible: true });
+    setTimeout(() => {
+      setToast(prev => ({ ...prev, visible: false }));
+    }, 3000);
+  };
+
   return (
-    <MainLayout>
-      <div className="p-4 pb-32">
+    <>
+      <MainLayout>
+        <div className="p-4 pb-32">
         <PokemonHeader className="mb-6" />
 
         {/* Tab Buttons */}
@@ -393,8 +442,20 @@ const RegisterPageContent = memo(() => {
             </button>
           </div>
         )}
-      </div>
-    </MainLayout>
+        </div>
+      </MainLayout>
+      {toast.visible && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-sm md:max-w-md animate-slide-up">
+          <div className="relative overflow-hidden rounded-2xl border-4 border-yellow-300 bg-gradient-to-r from-yellow-200 via-amber-100 to-yellow-200 shadow-[0_10px_25px_rgba(0,0,0,0.15)] px-4 py-3 text-sm md:text-base font-bold text-gray-900 text-center">
+            <div className="absolute inset-0 pointer-events-none opacity-30" />
+            <div className="relative flex items-center justify-center gap-2">
+              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-yellow-400 text-white font-black shadow-inner">!</span>
+              <span className="drop-shadow-sm">{toast.message}</span>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 });
 

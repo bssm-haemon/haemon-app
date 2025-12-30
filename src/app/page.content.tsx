@@ -9,7 +9,9 @@ import { useSightings } from "@/hooks/useSightings";
 import { useCollectionStats } from "@/hooks/useCollection";
 import { usePointsRanking } from "@/hooks/useRankings";
 import { useMyBadges } from "@/hooks/useBadges";
+import { useAquarium } from "@/hooks/useAquarium";
 import Image from "next/image";
+import Link from "next/link";
 import { getCreatureById } from "@/data/creatures";
 
 const BadgeSection = memo(function BadgeSection({ myBadges }: { myBadges: any }) {
@@ -146,6 +148,7 @@ export const HomePageContent = memo(function HomePageContent() {
   const { data: stats } = useCollectionStats();
   const { data: rankingsData } = usePointsRanking();
   const { data: myBadges } = useMyBadges();
+  const { data: aquariumData } = useAquarium();
 
   const userLevel = useMemo(() => Math.floor((user?.points ?? 0) / 100) + 1, [user?.points]);
   const recentIncome = useMemo(() => (user?.sighting_count ? user.sighting_count * 30 : 0), [user?.sighting_count]);
@@ -191,6 +194,49 @@ export const HomePageContent = memo(function HomePageContent() {
             <Trophy className="text-green-100 mb-2" size={24} />
             <p className="text-xs font-bold opacity-90 uppercase">목격</p>
             <p className="text-2xl font-black mt-1">{user?.sighting_count ?? 0}</p>
+          </div>
+        </div>
+
+        {/* Aquarium Preview */}
+        <div className="bg-white rounded-3xl border-2 border-cyan-200 p-4 shadow-sm hover:shadow-md transition-all duration-300">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">🪸</span>
+              <div>
+                <p className="text-[10px] uppercase font-bold text-cyan-700">내 아쿠아리움</p>
+                <p className="text-lg font-black text-gray-900">{aquariumData?.total ?? 0} 마리</p>
+              </div>
+            </div>
+            <Link
+              href="/aquarium"
+              className="text-sm font-bold text-cyan-700 bg-cyan-50 border border-cyan-200 rounded-full px-3 py-1 hover:bg-cyan-100 transition-colors"
+            >
+              전체보기
+            </Link>
+          </div>
+          <div className="flex gap-3 overflow-x-auto pb-1">
+            {(aquariumData?.aquarium ?? []).slice(0, 4).map(item => {
+              const fallback = getCreatureById(item.creature_id);
+              const imageSrc =
+                item.creature_image && item.creature_image.trim().length > 0
+                  ? item.creature_image
+                  : fallback?.image_path || `/poketmon/${fallback?.name || "돌고래"}.png`;
+              return (
+                <div
+                  key={item.id}
+                  className="min-w-[100px] rounded-2xl border border-cyan-100 bg-gradient-to-br from-white to-cyan-50 p-2 flex-shrink-0"
+                >
+                  <div className="relative w-full aspect-square bg-white rounded-xl overflow-hidden border border-cyan-100">
+                    <Image src={imageSrc} alt={item.creature_name} fill className="object-contain p-2" />
+                  </div>
+                  <p className="text-xs font-bold text-gray-900 mt-2 truncate">{item.creature_name}</p>
+                  <p className="text-[10px] text-gray-500">{item.rarity}</p>
+                </div>
+              );
+            })}
+            {(aquariumData?.aquarium?.length ?? 0) === 0 && (
+              <p className="text-sm text-gray-500">아직 아쿠아리움이 비었어요. 마켓에서 구매해보세요!</p>
+            )}
           </div>
         </div>
 

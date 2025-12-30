@@ -96,6 +96,30 @@ export interface CollectionItem {
   first_sighting_id: string;
 }
 
+// Market
+export interface MarketItem {
+  creature_id: string;
+  name: string;
+  name_en: string;
+  category: CreatureCategory;
+  image_url: string;
+  rarity: Rarity;
+  price: number;
+  in_aquarium: boolean;
+}
+
+// Aquarium
+export interface AquariumItem {
+  id: string;
+  creature_id: string;
+  creature_name: string;
+  creature_image: string;
+  rarity: Rarity;
+  position_x: number;
+  position_y: number;
+  purchased_at: string;
+}
+
 // Ranking
 export interface RankingItem {
   rank: number;

@@ -4,16 +4,11 @@ import MainLayout from "@/components/MainLayout";
 import PokemonHeader from "@/components/PokemonHeader";
 import { useUserDetail } from "@/hooks/useUser";
 import { useCleanups, useApproveCleanup, useRejectCleanup } from "@/hooks/useCleanups";
-import {
-  useCreatures,
-  useCreateCreature,
-  useUpdateCreature,
-  useDeleteCreature,
-} from "@/hooks/useCreatures";
+import { useCreatures, useUpdateCreature, useDeleteCreature } from "@/hooks/useCreatures";
 import { Creature, CreatureCategory, Rarity } from "@/types";
-import { CheckCircle, ShieldCheck, XCircle, Loader2, Sparkles, Fish } from "lucide-react";
+import { CheckCircle, ShieldCheck, XCircle, Loader2 } from "lucide-react";
 import clsx from "clsx";
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const creatureCategories: { value: CreatureCategory; label: string }[] = [
   { value: "cetacean", label: "고래류" },
@@ -54,19 +49,8 @@ export default function AdminPage() {
   const approveCleanup = useApproveCleanup();
   const rejectCleanup = useRejectCleanup();
 
-  const createCreature = useCreateCreature();
   const updateCreature = useUpdateCreature();
   const deleteCreature = useDeleteCreature();
-
-  const [newCreature, setNewCreature] = useState<Partial<Creature>>({
-    name: "",
-    name_en: "",
-    category: "fish",
-    description: "",
-    image_url: "",
-    rarity: "common",
-    points: 30,
-  });
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<Partial<Creature>>({});
 
@@ -78,26 +62,6 @@ export default function AdminPage() {
 
   const handleRejectCleanup = (id: string) => {
     rejectCleanup.mutate(id);
-  };
-
-  const handleCreateCreature = (e: FormEvent) => {
-    e.preventDefault();
-    createCreature.mutate(
-      { ...newCreature, points: Number(newCreature.points || 0) },
-      {
-        onSuccess: () => {
-          setNewCreature({
-            name: "",
-            name_en: "",
-            category: "fish",
-            description: "",
-            image_url: "",
-            rarity: "common",
-            points: 30,
-          });
-        },
-      },
-    );
   };
 
   const startEditCreature = (creature: Creature) => {
@@ -241,86 +205,6 @@ export default function AdminPage() {
             <h2 className="text-lg font-bold text-gray-900">생물 도감 관리</h2>
             <span className="text-sm text-gray-500">총 {creaturesData?.total ?? 0}종</span>
           </div>
-
-          <form onSubmit={handleCreateCreature} className="border border-blue-200 rounded-xl p-4 bg-blue-50 space-y-3">
-            <div className="flex items-center gap-2 text-blue-700 font-semibold">
-              <Sparkles size={18} />
-              새로운 생물 추가
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <input
-                required
-                value={newCreature.name || ""}
-                onChange={e => setNewCreature(prev => ({ ...prev, name: e.target.value }))}
-                placeholder="이름 (한글)"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
-              />
-              <input
-                required
-                value={newCreature.name_en || ""}
-                onChange={e => setNewCreature(prev => ({ ...prev, name_en: e.target.value }))}
-                placeholder="이름 (영문)"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
-              />
-              <select
-                value={newCreature.category}
-                onChange={e => setNewCreature(prev => ({ ...prev, category: e.target.value as CreatureCategory }))}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
-              >
-                {creatureCategories.map(cat => (
-                  <option key={cat.value} value={cat.value}>
-                    {cat.label}
-                  </option>
-                ))}
-              </select>
-              <select
-                value={newCreature.rarity}
-                onChange={e => setNewCreature(prev => ({ ...prev, rarity: e.target.value as Rarity }))}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
-              >
-                {rarityOptions.map(opt => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-              <input
-                required
-                type="number"
-                value={newCreature.points ?? 0}
-                onChange={e => setNewCreature(prev => ({ ...prev, points: Number(e.target.value) }))}
-                placeholder="포인트"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
-              />
-              <input
-                required
-                value={newCreature.image_url || ""}
-                onChange={e => setNewCreature(prev => ({ ...prev, image_url: e.target.value }))}
-                placeholder="이미지 URL"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
-              />
-            </div>
-            <textarea
-              required
-              value={newCreature.description || ""}
-              onChange={e => setNewCreature(prev => ({ ...prev, description: e.target.value }))}
-              placeholder="설명"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
-              rows={2}
-            />
-            <button
-              type="submit"
-              className={clsx(
-                "w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-semibold text-white",
-                "bg-blue-600 hover:bg-blue-700 transition-colors",
-                createCreature.isPending && "opacity-60 cursor-not-allowed",
-              )}
-              disabled={createCreature.isPending}
-            >
-              <Fish size={16} />
-              생물 추가
-            </button>
-          </form>
 
           <div className="space-y-3">
             {creaturesLoading ? (
