@@ -304,14 +304,15 @@ const CollectionPageContent = memo(() => {
                 </div>
 
                 {/* AR View Button */}
-                {/* 테스트용: 발견 여부 상관없이 항상 노출 */}
-                <button
-                  onClick={() => router.push(`/ar/${selectedCreature.id}`)}
-                  className="w-full mt-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
-                >
-                  <Camera size={24} />
-                  <span className="text-lg">AR로 소환하기</span>
-                </button>
+                {isSelectedDiscovered && (
+                  <button
+                    onClick={() => router.push(`/ar/${selectedCreature.id}`)}
+                    className="w-full mt-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
+                  >
+                    <Camera size={24} />
+                    <span className="text-lg">AR로 소환하기</span>
+                  </button>
+                )}
               </div>
             </div>
           </div>
