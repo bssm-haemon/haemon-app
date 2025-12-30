@@ -89,8 +89,7 @@ const RegisterPageContent = memo(() => {
           setAiConfidence(data.confidence);
         },
         onError: error => {
-          const detail =
-            (error as AxiosError)?.response?.data && (error as AxiosError<{ detail?: string }>).response?.data?.detail;
+          const detail: string | undefined = (error as AxiosError<{ detail?: string }>)?.response?.data?.detail;
           showToast(detail || "AI 분석 중 오류가 발생했습니다.");
         },
       });
