@@ -17,6 +17,11 @@ export const metadata: Metadata = {
   title: "해몬도감 | 바다를 지키며 도감을 채우자",
   description: "해양 ESG 게이미피케이션 앱 - 바다 생물을 수집하고 해양 환경을 보호하세요",
   viewport: "width=device-width, initial-scale=1, maximum-scale=1",
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/favicon.ico",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
