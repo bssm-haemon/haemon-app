@@ -198,47 +198,30 @@ export const HomePageContent = memo(function HomePageContent() {
         </div>
 
         {/* Aquarium Preview */}
-        <div className="bg-white rounded-3xl border-2 border-cyan-200 p-4 shadow-sm hover:shadow-md transition-all duration-300">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <span className="text-2xl">🪸</span>
-              <div>
-                <p className="text-[10px] uppercase font-bold text-cyan-700">내 아쿠아리움</p>
-                <p className="text-lg font-black text-gray-900">{aquariumData?.total ?? 0} 마리</p>
+        <Link
+          href="/aquarium"
+          className="block bg-white rounded-3xl border-2 border-cyan-200 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden group"
+        >
+          <div className="relative h-48 md:h-56">
+            <div className="absolute inset-0 bg-[url('/aquariumBackground.png')] bg-cover bg-center" />
+            <div className="absolute inset-0 bg-gradient-to-r from-cyan-900/50 via-cyan-800/30 to-transparent group-hover:from-cyan-900/60 group-hover:via-cyan-800/40" />
+            <div className="relative h-full flex flex-col justify-between p-4 text-white">
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">🪸</span>
+                <div>
+                  <p className="text-[10px] uppercase font-bold text-cyan-100">내 아쿠아리움</p>
+                  <p className="text-2xl font-black leading-tight">{aquariumData?.total ?? 0} 마리</p>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-semibold text-cyan-50">배경 속으로 바로 입장해보세요</p>
+                <span className="inline-flex items-center gap-1 text-xs font-bold px-3 py-1 rounded-full bg-white/85 text-cyan-700 shadow-sm">
+                  바로가기
+                </span>
               </div>
             </div>
-            <Link
-              href="/aquarium"
-              className="text-sm font-bold text-cyan-700 bg-cyan-50 border border-cyan-200 rounded-full px-3 py-1 hover:bg-cyan-100 transition-colors"
-            >
-              전체보기
-            </Link>
           </div>
-          <div className="flex gap-3 overflow-x-auto pb-1">
-            {(aquariumData?.aquarium ?? []).slice(0, 4).map(item => {
-              const fallback = getCreatureById(item.creature_id);
-              const imageSrc =
-                item.creature_image && item.creature_image.trim().length > 0
-                  ? item.creature_image
-                  : fallback?.image_path || `/poketmon/${fallback?.name || "돌고래"}.png`;
-              return (
-                <div
-                  key={item.id}
-                  className="min-w-[100px] rounded-2xl border border-cyan-100 bg-gradient-to-br from-white to-cyan-50 p-2 flex-shrink-0"
-                >
-                  <div className="relative w-full aspect-square bg-white rounded-xl overflow-hidden border border-cyan-100">
-                    <Image src={imageSrc} alt={item.creature_name} fill className="object-contain p-2" />
-                  </div>
-                  <p className="text-xs font-bold text-gray-900 mt-2 truncate">{item.creature_name}</p>
-                  <p className="text-[10px] text-gray-500">{item.rarity}</p>
-                </div>
-              );
-            })}
-            {(aquariumData?.aquarium?.length ?? 0) === 0 && (
-              <p className="text-sm text-gray-500">아직 아쿠아리움이 비었어요. 마켓에서 구매해보세요!</p>
-            )}
-          </div>
-        </div>
+        </Link>
 
         {/* My Badges */}
         <div>
