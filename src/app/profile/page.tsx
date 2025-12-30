@@ -30,7 +30,7 @@ export default function ProfilePage() {
 
   return (
     <MainLayout>
-      <div className="p-4">
+      <div className="p-4 pb-4">
         {/* Profile Header - Pokémon Go Style */}
         <div className="bg-gradient-to-br from-red-500 via-yellow-400 to-orange-500 rounded-3xl p-8 text-white mb-6 text-center shadow-2xl border-4 border-yellow-300">
           <div className="w-24 h-24 bg-white bg-opacity-20 backdrop-blur-sm rounded-full mx-auto mb-4 flex items-center justify-center text-4xl font-black overflow-hidden border-4 border-white">

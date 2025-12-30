@@ -21,8 +21,8 @@ export default function MainLayout({ children, showNav = true }: MainLayoutProps
   }, [router, pathname]);
 
   return (
-    <div className="min-h-screen bg-white">
-      <main className="pb-20 max-w-screen-sm mx-auto">{children}</main>
+    <div className="min-h-screen bg-white flex flex-col">
+      <main className="flex-1 pb-24 max-w-screen-sm mx-auto w-full overflow-x-hidden">{children}</main>
       {showNav && <BottomNavBar />}
     </div>
   );

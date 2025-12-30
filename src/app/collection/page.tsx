@@ -19,9 +19,7 @@ export default function CollectionPage() {
 
   // 필터링된 생물 목록
   const filteredCreatures =
-    selectedRarity === "all"
-      ? STATIC_CREATURES
-      : STATIC_CREATURES.filter((c) => c.rarity === selectedRarity);
+    selectedRarity === "all" ? STATIC_CREATURES : STATIC_CREATURES.filter(c => c.rarity === selectedRarity);
 
   const rarityColors = {
     common: "bg-gray-100 text-gray-700 border-gray-300",
@@ -37,19 +35,15 @@ export default function CollectionPage() {
 
   return (
     <MainLayout>
-      <div className="p-4">
+      <div className="p-4 pb-4">
         <PokemonHeader className="mb-6" />
 
         {/* Stats Card */}
         <div className="bg-gradient-to-r from-blue-500 to-teal-500 rounded-lg p-4 text-white mb-6">
           <h2 className="text-lg font-bold mb-2">도감 완성률</h2>
           <div className="flex items-end gap-2 mb-3">
-            <span className="text-4xl font-bold">
-              {stats?.discovered_count || 0}
-            </span>
-            <span className="text-xl opacity-90 mb-1">
-              / {stats?.total_creatures || STATIC_CREATURES.length}
-            </span>
+            <span className="text-4xl font-bold">{stats?.discovered_count || 0}</span>
+            <span className="text-xl opacity-90 mb-1">/ {stats?.total_creatures || STATIC_CREATURES.length}</span>
           </div>
           <div className="w-full bg-white/30 rounded-full h-3 overflow-hidden">
             <div
@@ -59,26 +53,16 @@ export default function CollectionPage() {
               }}
             />
           </div>
-          <p className="text-sm mt-2 opacity-90">
-            {stats?.completion_rate?.toFixed(1) || 0}% 완료
-          </p>
+          <p className="text-sm mt-2 opacity-90">{stats?.completion_rate?.toFixed(1) || 0}% 완료</p>
         </div>
 
         {/* Rarity Stats */}
         <div className="grid grid-cols-3 gap-3 mb-6">
-          {(["common", "rare", "legendary"] as Rarity[]).map((rarity) => {
+          {(["common", "rare", "legendary"] as Rarity[]).map(rarity => {
             const rarityStats = stats?.by_rarity?.[rarity];
             return (
-              <div
-                key={rarity}
-                className={clsx(
-                  "rounded-lg p-3 text-center border-2",
-                  rarityColors[rarity]
-                )}
-              >
-                <p className="text-xs font-semibold mb-1">
-                  {rarityLabels[rarity]}
-                </p>
+              <div key={rarity} className={clsx("rounded-lg p-3 text-center border-2", rarityColors[rarity])}>
+                <p className="text-xs font-semibold mb-1">{rarityLabels[rarity]}</p>
                 <p className="text-lg font-bold">
                   {rarityStats?.discovered || 0}/{rarityStats?.total || 0}
                 </p>
@@ -95,14 +79,12 @@ export default function CollectionPage() {
               onClick={() => setSelectedRarity("all")}
               className={clsx(
                 "px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap transition-all",
-                selectedRarity === "all"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                selectedRarity === "all" ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200",
               )}
             >
               전체
             </button>
-            {(["common", "rare", "legendary"] as Rarity[]).map((rarity) => (
+            {(["common", "rare", "legendary"] as Rarity[]).map(rarity => (
               <button
                 key={rarity}
                 onClick={() => setSelectedRarity(rarity)}
@@ -110,7 +92,7 @@ export default function CollectionPage() {
                   "px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap transition-all border-2",
                   selectedRarity === rarity
                     ? rarityColors[rarity]
-                    : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"
+                    : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50",
                 )}
               >
                 {rarityLabels[rarity]}
@@ -121,7 +103,7 @@ export default function CollectionPage() {
 
         {/* Creatures Grid */}
         <div className="grid grid-cols-2 gap-4">
-          {filteredCreatures.map((creature) => {
+          {filteredCreatures.map(creature => {
             const isDiscovered = discoveredIds.has(creature.id);
 
             return (
@@ -129,9 +111,7 @@ export default function CollectionPage() {
                 key={creature.id}
                 className={clsx(
                   "bg-white rounded-lg border-2 overflow-hidden transition-all",
-                  isDiscovered
-                    ? "border-blue-200 hover:shadow-lg"
-                    : "border-gray-200 opacity-75"
+                  isDiscovered ? "border-blue-200 hover:shadow-lg" : "border-gray-200 opacity-75",
                 )}
               >
                 {/* Image */}
@@ -140,16 +120,11 @@ export default function CollectionPage() {
                     src={creature.image_path}
                     alt={isDiscovered ? creature.name : "???"}
                     fill
-                    className={clsx(
-                      "object-contain p-3 transition-all",
-                      !isDiscovered && "blur-md grayscale"
-                    )}
+                    className={clsx("object-contain p-3 transition-all", !isDiscovered && "blur-md grayscale")}
                   />
                   {!isDiscovered && (
                     <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                      <span className="text-4xl font-bold text-white drop-shadow-lg">
-                        ?
-                      </span>
+                      <span className="text-4xl font-bold text-white drop-shadow-lg">?</span>
                     </div>
                   )}
                 </div>
@@ -157,13 +132,11 @@ export default function CollectionPage() {
                 {/* Info */}
                 <div className="p-3">
                   <div className="flex items-center justify-between mb-1">
-                    <h3 className="font-bold text-gray-900">
-                      {isDiscovered ? creature.name : "???"}
-                    </h3>
+                    <h3 className="font-bold text-gray-900">{isDiscovered ? creature.name : "???"}</h3>
                     <span
                       className={clsx(
                         "text-xs px-2 py-0.5 rounded-full font-semibold border",
-                        rarityColors[creature.rarity]
+                        rarityColors[creature.rarity],
                       )}
                     >
                       {rarityLabels[creature.rarity]}
@@ -172,11 +145,7 @@ export default function CollectionPage() {
                   <p className="text-xs text-gray-600 line-clamp-2">
                     {isDiscovered ? creature.description : "아직 발견하지 못한 생물입니다."}
                   </p>
-                  {isDiscovered && (
-                    <p className="text-xs text-blue-600 font-semibold mt-2">
-                      +{creature.points}p
-                    </p>
-                  )}
+                  {isDiscovered && <p className="text-xs text-blue-600 font-semibold mt-2">+{creature.points}p</p>}
                 </div>
               </div>
             );
