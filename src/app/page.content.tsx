@@ -79,18 +79,17 @@ const RecentActivitySection = memo(function RecentActivitySection({ sightingsDat
             {sighting.creature_id
               ? `${getCreatureById(sighting.creature_id)?.name || "미확인"} 발견!`
               : sighting.ai_suggestion
-              ? `AI 제안: ${sighting.ai_suggestion}`
-              : "AI 분석 대기"}
+                ? `AI 제안: ${sighting.ai_suggestion}`
+                : "AI 분석 대기"}
           </p>
           <div className="flex items-center gap-2 text-xs pt-2 border-t border-gray-100">
             <span
-              className={`inline-flex items-center gap-1 px-3 py-1 rounded-full font-bold ${
-                sighting.status === "approved"
-                  ? "bg-green-100 text-green-700"
-                  : sighting.status === "pending"
+              className={`inline-flex items-center gap-1 px-3 py-1 rounded-full font-bold ${sighting.status === "approved"
+                ? "bg-green-100 text-green-700"
+                : sighting.status === "pending"
                   ? "bg-yellow-100 text-yellow-700"
                   : "bg-red-100 text-red-700"
-              }`}
+                }`}
             >
               {sighting.status === "approved" ? <CheckCircle2 size={12} /> : <Hourglass size={12} />}
               {sighting.status === "approved" ? "승인됨" : sighting.status === "pending" ? "검수중" : "거절"}
@@ -121,13 +120,12 @@ const RankingSection = memo(function RankingSection({ rankingsData }: { rankings
         >
           <div className="flex items-center gap-4">
             <span
-              className={`font-black text-xl w-10 h-10 flex items-center justify-center rounded-full ${
-                item.rank === 1
-                  ? "bg-gradient-to-br from-yellow-400 to-yellow-500 text-white"
-                  : item.rank === 2
+              className={`font-black text-xl w-10 h-10 flex items-center justify-center rounded-full ${item.rank === 1
+                ? "bg-gradient-to-br from-yellow-400 to-yellow-500 text-white"
+                : item.rank === 2
                   ? "bg-gradient-to-br from-gray-300 to-gray-400 text-white"
                   : "bg-gradient-to-br from-orange-400 to-orange-500 text-white"
-              }`}
+                }`}
             >
               {item.rank}
             </span>
@@ -169,13 +167,13 @@ export const HomePageContent = memo(function HomePageContent() {
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white border-opacity-40">
-            <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-2xl p-3">
-              <p className="text-xs font-bold opacity-80 uppercase">레벨</p>
-              <p className="text-3xl font-black mt-1">{userLevel}</p>
+            <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-2xl p-3 text-gray-900">
+              <p className="text-xs font-bold opacity-80 uppercase text-gray-800">레벨</p>
+              <p className="text-3xl font-black mt-1 text-gray-900">{userLevel}</p>
             </div>
-            <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-2xl p-3">
-              <p className="text-xs font-bold opacity-80 uppercase">도감</p>
-              <p className="text-3xl font-black mt-1">
+            <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-2xl p-3 text-gray-900">
+              <p className="text-xs font-black opacity-80 uppercase text-gray-800">도감</p>
+              <p className="text-3xl font-black mt-1 text-gray-900">
                 {stats?.discovered_count ?? 0}/{stats?.total_creatures ?? 0}
               </p>
             </div>

@@ -49,6 +49,23 @@ const RegisterPageContent = memo(() => {
   const classifyCreature = useAIClassifyCreature();
   const classifyTrash = useAIClassifyTrash();
 
+  const PoketballLoader = ({ tone }: { tone: "blue" | "green" }) => (
+    <div className="absolute inset-0 bg-white/70 backdrop-blur-sm rounded-2xl flex flex-col items-center justify-center animate-fade-in">
+      <div className="relative w-16 h-16 mb-3">
+        <div className="poketball-shadow" />
+        <img
+          src="/poketball.webp"
+          alt="poketball"
+          className={clsx(
+            "w-16 h-16 object-contain poketball-throw poketball-spin",
+            tone === "green" ? "poketball-green" : "poketball-blue"
+          )}
+        />
+      </div>
+      <p className={clsx("text-sm font-bold", tone === "green" ? "text-green-700" : "text-blue-800")}>AI 분석 중...</p>
+    </div>
+  );
+
   const onCreaturePhotoChange = async (file: File | null) => {
     // 이전 미리보기 URL 정리
     if (creaturePhotoPreview) {
@@ -226,12 +243,7 @@ const RegisterPageContent = memo(() => {
                   </>
                 )}
               </label>
-              {classifyCreature.isPending && (
-                <div className="absolute inset-0 bg-white/60 backdrop-blur-sm rounded-2xl flex flex-col items-center justify-center animate-fade-in">
-                  <Loader2 className="animate-spin text-blue-600 mb-2" size={32} />
-                  <p className="text-sm font-bold text-blue-800">AI 분석 중...</p>
-                </div>
-              )}
+              {classifyCreature.isPending && <PoketballLoader tone="blue" />}
             </div>
 
             {aiSuggestion && (
@@ -304,11 +316,7 @@ const RegisterPageContent = memo(() => {
                     </>
                   )}
                 </label>
-                {classifyTrash.isPending && (
-                  <div className="absolute inset-0 bg-white/60 backdrop-blur-sm rounded-2xl flex flex-col items-center justify-center">
-                    <Loader2 className="animate-spin text-green-600" size={24} />
-                  </div>
-                )}
+                {classifyTrash.isPending && <PoketballLoader tone="green" />}
               </div>
 
               <input
