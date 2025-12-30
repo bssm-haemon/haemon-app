@@ -3,7 +3,7 @@
 import MainLayout from "@/components/MainLayout";
 import PokemonHeader from "@/components/PokemonHeader";
 import { useState, memo } from "react";
-import { Filter } from "lucide-react";
+import { Filter, X, Sparkles, Star, Shield } from "lucide-react";
 import clsx from "clsx";
 import Image from "next/image";
 import { useCollection, useCollectionStats } from "@/hooks/useCollection";
@@ -11,6 +11,7 @@ import { STATIC_CREATURES, Rarity } from "@/data/creatures";
 
 const CollectionPageContent = memo(() => {
   const [selectedRarity, setSelectedRarity] = useState<Rarity | "all">("all");
+  const [selectedCreatureId, setSelectedCreatureId] = useState<string | null>(null);
   const { data: collectionData } = useCollection();
   const { data: stats } = useCollectionStats();
 
@@ -32,6 +33,20 @@ const CollectionPageContent = memo(() => {
     rare: "희귀",
     legendary: "전설",
   };
+
+  const categoryLabels: Record<string, string> = {
+    cetacean: "고래류",
+    turtle: "거북류",
+    pinniped: "기각류",
+    fish: "어류",
+    jellyfish: "해파리류",
+    crustacean: "갑각류",
+    mollusk: "연체류",
+    bird: "조류",
+  };
+
+  const selectedCreature = selectedCreatureId ? STATIC_CREATURES.find(c => c.id === selectedCreatureId) : null;
+  const isSelectedDiscovered = selectedCreature ? discoveredIds.has(selectedCreature.id) : false;
 
   return (
     <MainLayout>
@@ -123,6 +138,7 @@ const CollectionPageContent = memo(() => {
                   "bg-white rounded-2xl border-2 overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-xl cursor-pointer",
                   isDiscovered ? "border-blue-300 shadow-md" : "border-gray-200 opacity-60",
                 )}
+                onClick={() => setSelectedCreatureId(creature.id)}
               >
                 {/* Image */}
                 <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-50 relative overflow-hidden">
@@ -156,7 +172,7 @@ const CollectionPageContent = memo(() => {
                     </span>
                   </div>
                   <p className="text-xs text-gray-600 line-clamp-2 font-medium">
-                    {isDiscovered ? creature.description : "아직 발견하지 못한 생물입니다."}
+                    {isDiscovered ? creature.summary : "아직 발견하지 못한 생물입니다."}
                   </p>
                   {isDiscovered && (
                     <p className="text-xs font-black text-green-600 mt-3 bg-green-50 px-2 py-1 rounded-lg text-center">
@@ -169,6 +185,126 @@ const CollectionPageContent = memo(() => {
           })}
         </div>
       </div>
+      {/* Detail Modal */}
+      {selectedCreature && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 py-6">
+          <div className="relative w-full max-w-5xl bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-200">
+            <button
+              className="absolute top-4 right-4 rounded-full bg-black/5 p-2 hover:bg-black/10 transition"
+              onClick={() => setSelectedCreatureId(null)}
+              aria-label="닫기"
+            >
+              <X size={18} />
+            </button>
+
+            <div className="grid md:grid-cols-2 gap-6 items-center px-6 py-8">
+              {/* Left: Artwork */}
+              <div className="flex justify-center md:justify-start">
+                <div className="relative w-64 h-64 md:w-80 md:h-80">
+                  <Image
+                    src={selectedCreature.image_path}
+                    alt={selectedCreature.name}
+                    fill
+                    className={clsx("object-contain drop-shadow-2xl", !isSelectedDiscovered && "blur-md grayscale")}
+                  />
+                  {!isSelectedDiscovered && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-white/60 rounded-2xl">
+                      <span className="text-4xl font-bold text-gray-800">?</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Right: Info */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-gray-500 text-sm">
+                  <span className="font-semibold">No.{selectedCreature.id.split("-")[1]}</span>
+                  <span className="text-gray-400">·</span>
+                  <span>{selectedCreature.name_en}</span>
+                </div>
+                <h3 className="text-3xl font-bold text-gray-900">
+                  {isSelectedDiscovered ? selectedCreature.name : "???"}
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  <span
+                    className={clsx(
+                      "inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold",
+                      rarityColors[selectedCreature.rarity],
+                    )}
+                  >
+                    {rarityLabels[selectedCreature.rarity]}
+                  </span>
+                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold bg-gray-100 text-gray-800 border border-gray-200">
+                    {categoryLabels[selectedCreature.category]}
+                  </span>
+                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                    도감 No. {selectedCreature.id.split("-")[1]}
+                  </span>
+                </div>
+                <p className="text-gray-700 leading-relaxed">
+                  {isSelectedDiscovered
+                    ? selectedCreature.summary
+                    : "아직 발견하지 못했습니다. 탐험을 계속해 도감을 채워보세요!"}
+                </p>
+
+                <div className="border border-gray-200 rounded-2xl p-4 shadow-sm bg-white">
+                  <div className="grid grid-cols-3 gap-3 text-sm">
+                    <div>
+                      <p className="text-gray-500 text-xs">타입</p>
+                      <div className="mt-1 flex gap-1">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-100 text-xs font-semibold">
+                          물
+                        </span>
+                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-purple-50 text-purple-700 border border-purple-100 text-xs font-semibold">
+                          {categoryLabels[selectedCreature.category]}
+                        </span>
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-xs">포인트</p>
+                      <p className="text-base font-semibold text-gray-900 mt-1">{selectedCreature.points}p</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-xs">발견 상태</p>
+                      <p className="text-base font-semibold text-gray-900 mt-1">
+                        {isSelectedDiscovered ? "발견됨" : "미발견"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-xs">희귀도</p>
+                      <p className="text-base font-semibold text-gray-900 mt-1">
+                        {rarityLabels[selectedCreature.rarity]}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-xs">분류</p>
+                      <p className="text-base font-semibold text-gray-900 mt-1">
+                        {categoryLabels[selectedCreature.category]}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-xs">도감 번호</p>
+                      <p className="text-base font-semibold text-gray-900 mt-1">{selectedCreature.id.split("-")[1]}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Sparkles size={16} className="text-amber-500" />
+                    <p className="text-sm font-semibold text-gray-900">상세 설명</p>
+                  </div>
+                  <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
+                    {isSelectedDiscovered
+                      ? selectedCreature.description
+                      : "발견 후 상세 능력치와 기술을 확인할 수 있습니다."}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </MainLayout>
   );
 });
