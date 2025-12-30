@@ -170,7 +170,7 @@ export default function RegisterPage() {
 
   return (
     <MainLayout>
-      <div className="p-4 pb-24">
+      <div className="p-4 pb-32">
         <PokemonHeader className="mb-6" />
 
         {/* Tab Buttons */}
