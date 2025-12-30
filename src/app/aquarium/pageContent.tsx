@@ -2,27 +2,40 @@
 
 import MainLayout from "@/components/MainLayout";
 import PokemonHeader from "@/components/PokemonHeader";
-import { useAquarium, useRemoveAquarium } from "@/hooks/useAquarium";
+import { useAquarium } from "@/hooks/useAquarium";
 import { AquariumItem } from "@/types";
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import clsx from "clsx";
-import { Waves } from "lucide-react";
 import Link from "next/link";
 import { getCreatureById } from "@/data/creatures";
 
 export function AquariumPageContent() {
   const { data, isLoading } = useAquarium();
-  const removeMutation = useRemoveAquarium();
-  const [poses, setPoses] = useState<Record<string, { x: number; y: number; scale: number }>>({});
-  const directionsRef = useRef<Record<string, 1 | -1>>({});
+  const [poses, setPoses] = useState<Record<string, { x: number; y: number; scale: number; heading: number }>>({});
+  const swimParamsRef = useRef<
+    Record<string, { dir: 1 | -1; speed: number; amplitude: number; phase: number; baseY: number }>
+  >({});
+  const lastFrameRef = useRef<number | null>(null);
   const [activeCard, setActiveCard] = useState<AquariumItem | null>(null);
+  const [isClient, setIsClient] = useState(false);
 
   const randomPose = () => ({
     x: 10 + Math.random() * 80,
     y: 15 + Math.random() * 70,
     scale: 0.85 + Math.random() * 0.4,
+    heading: 0,
   });
+
+  const randomSwimParams = (baseY: number) => {
+    return {
+      dir: (Math.random() > 0.5 ? 1 : -1) as 1 | -1,
+      speed: 3.5 + Math.random() * 2.5, // horizontal percent per second
+      amplitude: 4 + Math.random() * 4, // vertical bob amplitude
+      phase: Math.random() * Math.PI * 2,
+      baseY,
+    };
+  };
 
   const clamp = (val: number, min: number, max: number) => Math.min(Math.max(val, min), max);
 
@@ -34,8 +47,9 @@ export function AquariumPageContent() {
       const next = { ...prev };
       aquariumItems.forEach(item => {
         if (!next[item.id]) {
-          next[item.id] = randomPose();
-          directionsRef.current[item.id] = Math.random() > 0.5 ? 1 : -1;
+          const initialPose = randomPose();
+          next[item.id] = initialPose;
+          swimParamsRef.current[item.id] = randomSwimParams(initialPose.y);
         }
       });
       return next;
@@ -44,35 +58,62 @@ export function AquariumPageContent() {
 
   useEffect(() => {
     if (!aquariumItems.length) return;
-    const interval = setInterval(() => {
+    let raf: number;
+    const step = (timestamp: number) => {
+      if (lastFrameRef.current === null) lastFrameRef.current = timestamp;
+      const deltaSeconds = (timestamp - (lastFrameRef.current ?? timestamp)) / 1000;
+      lastFrameRef.current = timestamp;
+
       setPoses(prev => {
         const next: typeof prev = { ...prev };
         aquariumItems.forEach(item => {
           const current = prev[item.id] || randomPose();
-          const dir = directionsRef.current[item.id] ?? 1;
-          const delta = 0.6 + Math.random() * 0.8; // 작은 폭으로 자주 이동
-          let newX = current.x + dir * delta;
-          let newDir: 1 | -1 = dir;
-          if (newX > 98) {
-            newX = 98;
-            newDir = -1;
-          } else if (newX < 2) {
-            newX = 2;
-            newDir = 1;
+          const params = swimParamsRef.current[item.id] || randomSwimParams(current.y);
+          params.phase += deltaSeconds * 0.9;
+
+          let nextX = current.x + params.dir * params.speed * deltaSeconds;
+          let nextDir: 1 | -1 = params.dir;
+          const minX = 6;
+          const maxX = 94;
+          if (nextX < minX || nextX > maxX) {
+            nextDir = (params.dir === 1 ? -1 : 1) as 1 | -1;
+            nextX = clamp(nextX, minX, maxX);
           }
-          const wobble = Math.random() * 0.5 - 0.25;
-          next[item.id] = { x: newX, y: current.y + wobble, scale: current.scale };
-          directionsRef.current[item.id] = newDir;
+
+          const minY = 12;
+          const maxY = 88;
+          const bob = Math.sin(params.phase) * params.amplitude;
+          const nextY = clamp(params.baseY + bob, minY, maxY);
+
+          const targetHeading = nextDir * 8 + Math.sin(params.phase * 2) * 2;
+          const heading = clamp(current.heading + (targetHeading - current.heading) * 0.12, -14, 14);
+
+          next[item.id] = { x: nextX, y: nextY, scale: current.scale, heading };
+          swimParamsRef.current[item.id] = {
+            ...params,
+            dir: nextDir,
+          };
         });
         return next;
       });
-    }, 320);
-    return () => clearInterval(interval);
+
+      raf = requestAnimationFrame(step);
+    };
+
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
   }, [aquariumItems]);
 
-  const isClient = typeof window !== "undefined";
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   if (!isClient) {
-    return null;
+    return (
+      <MainLayout fullWidth backgroundClassName="bg-transparent">
+        <div className="min-h-screen" />
+      </MainLayout>
+    );
   }
 
   return (
@@ -118,12 +159,16 @@ export function AquariumPageContent() {
                   item.creature_image && item.creature_image.trim().length > 0
                     ? item.creature_image
                     : fallback?.image_path || `/poketmon/${fallback?.name || "돌고래"}.png`;
-                const pose = poses[item.id] || { x: 50, y: 50, scale: 1 };
+                const pose = poses[item.id] || { x: 50, y: 50, scale: 1, heading: 0 };
                 return (
                   <div
                     key={item.id}
-                    className="absolute transition-transform duration-400 ease-linear"
-                    style={{ left: `${pose.x}%`, top: `${pose.y}%`, transform: `translate(-50%, -50%) scale(${pose.scale})` }}
+                    className="absolute will-change-transform"
+                    style={{
+                      left: `${pose.x}%`,
+                      top: `${pose.y}%`,
+                      transform: `translate(-50%, -50%) scale(${pose.scale}) rotate(${pose.heading}deg)`,
+                    }}
                     onClick={() => setActiveCard(item)}
                   >
                     <div className="relative w-28 h-28 md:w-32 md:h-32">
