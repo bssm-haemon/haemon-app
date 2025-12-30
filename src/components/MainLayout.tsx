@@ -28,7 +28,7 @@ export default function MainLayout({
   }, [router, pathname]);
 
   return (
-    <div className={`min-h-screen flex flex-col ${backgroundClassName}`}>
+    <div className={`min-h-screen flex flex-col pb-20 ${backgroundClassName}`}>
       <main className={`flex-1 pb-24 w-full overflow-x-hidden ${fullWidth ? "" : "max-w-screen-sm mx-auto"}`}>
         {children}
       </main>
