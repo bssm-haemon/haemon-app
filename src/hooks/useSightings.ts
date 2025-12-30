@@ -16,7 +16,7 @@ export const useSightings = (
   return useQuery<SightingsResponse>({
     queryKey: ["sightings", params],
     queryFn: async () => {
-      const { data } = await apiClient.get("/sightings", { params });
+      const { data } = await apiClient.get("/api/sightings", { params });
       return data;
     },
     enabled: options?.enabled,
@@ -27,7 +27,7 @@ export const useSightingDetail = (id: string) => {
   return useQuery<Sighting>({
     queryKey: ["sightings", id],
     queryFn: async () => {
-      const { data } = await apiClient.get(`/sightings/${id}`);
+      const { data } = await apiClient.get(`/api/sightings/${id}`);
       return data;
     },
     enabled: !!id,
@@ -38,7 +38,7 @@ export const useCreateSighting = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (formData: FormData) => {
-      const { data } = await apiClient.post("/sightings", formData, {
+      const { data } = await apiClient.post("/api/sightings", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -55,7 +55,7 @@ export const useUpdateSightingStatus = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, status, creature_id }: { id: string; status: string; creature_id?: string }) => {
-      const { data } = await apiClient.patch(`/sightings/${id}/status`, { status, creature_id });
+      const { data } = await apiClient.patch(`/api/sightings/${id}/status`, { status, creature_id });
       return data;
     },
     onSuccess: (_, variables) => {

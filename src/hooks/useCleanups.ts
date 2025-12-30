@@ -16,7 +16,7 @@ export const useCleanups = (
   return useQuery<CleanupsResponse>({
     queryKey: ["cleanups", params],
     queryFn: async () => {
-      const { data } = await apiClient.get("/cleanups", { params });
+      const { data } = await apiClient.get("/api/cleanups", { params });
       return data;
     },
     enabled: options?.enabled,
@@ -27,7 +27,7 @@ export const useCleanupDetail = (id: string) => {
   return useQuery<Cleanup>({
     queryKey: ["cleanups", id],
     queryFn: async () => {
-      const { data } = await apiClient.get(`/cleanups/${id}`);
+      const { data } = await apiClient.get(`/api/cleanups/${id}`);
       return data;
     },
     enabled: !!id,
@@ -38,7 +38,7 @@ export const useCreateCleanup = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (formData: FormData) => {
-      const { data } = await apiClient.post("/cleanups", formData, {
+      const { data } = await apiClient.post("/api/cleanups", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -55,7 +55,7 @@ export const useApproveCleanup = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      const { data } = await apiClient.patch(`/cleanups/${id}/approve`);
+      const { data } = await apiClient.patch(`/api/cleanups/${id}/approve`);
       return data;
     },
     onSuccess: (_, id) => {
@@ -69,7 +69,7 @@ export const useRejectCleanup = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      const { data } = await apiClient.patch(`/cleanups/${id}/reject`);
+      const { data } = await apiClient.patch(`/api/cleanups/${id}/reject`);
       return data;
     },
     onSuccess: (_, id) => {

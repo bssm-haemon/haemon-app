@@ -7,7 +7,7 @@ export const useAIClassifyCreature = () => {
         mutationFn: async (photo: File) => {
             const formData = new FormData();
             formData.append("photo", photo);
-            const { data } = await apiClient.post("/ai/classify/creature", formData, {
+            const { data } = await apiClient.post("/api/ai/classify/creature", formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
             return data as {
@@ -26,7 +26,7 @@ export const useAIClassifyTrash = () => {
         mutationFn: async (photo: File) => {
             const formData = new FormData();
             formData.append("photo", photo);
-            const { data } = await apiClient.post("/ai/classify/trash", formData, {
+            const { data } = await apiClient.post("/api/ai/classify/trash", formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
             return data as {
@@ -44,7 +44,7 @@ export const useAIVerifyCleanup = () => {
             const formData = new FormData();
             formData.append("before_photo", before_photo);
             formData.append("after_photo", after_photo);
-            const { data } = await apiClient.post("/ai/verify/cleanup", formData, {
+            const { data } = await apiClient.post("/api/ai/verify/cleanup", formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
             return data as {
@@ -62,7 +62,7 @@ export const useAICheckDuplicate = () => {
         mutationFn: async (photo: File) => {
             const formData = new FormData();
             formData.append("photo", photo);
-            const { data } = await apiClient.post("/ai/check-duplicate", formData, {
+            const { data } = await apiClient.post("/api/ai/check-duplicate", formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
             return data as {

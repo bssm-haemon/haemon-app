@@ -3,15 +3,17 @@
 import MainLayout from "@/components/MainLayout";
 import PokemonHeader from "@/components/PokemonHeader";
 import { useState, memo } from "react";
-import { Filter, X, Sparkles, Star, Shield } from "lucide-react";
+import { Filter, X, Sparkles, Star, Shield, Camera } from "lucide-react";
 import clsx from "clsx";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useCollection, useCollectionStats } from "@/hooks/useCollection";
 import { STATIC_CREATURES, Rarity } from "@/data/creatures";
 
 const CollectionPageContent = memo(() => {
   const [selectedRarity, setSelectedRarity] = useState<Rarity | "all">("all");
   const [selectedCreatureId, setSelectedCreatureId] = useState<string | null>(null);
+  const router = useRouter();
   const { data: collectionData } = useCollection();
   const { data: stats } = useCollectionStats();
 
@@ -300,6 +302,16 @@ const CollectionPageContent = memo(() => {
                       : "발견 후 상세 능력치와 기술을 확인할 수 있습니다."}
                   </p>
                 </div>
+
+                {/* AR View Button */}
+                {/* 테스트용: 발견 여부 상관없이 항상 노출 */}
+                <button
+                  onClick={() => router.push(`/ar/${selectedCreature.id}`)}
+                  className="w-full mt-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
+                >
+                  <Camera size={24} />
+                  <span className="text-lg">AR로 소환하기</span>
+                </button>
               </div>
             </div>
           </div>

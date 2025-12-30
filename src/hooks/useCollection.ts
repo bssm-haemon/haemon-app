@@ -28,7 +28,7 @@ export const useCollection = () => {
     return useQuery<CollectionResponse>({
         queryKey: ["collection"],
         queryFn: async () => {
-            const { data } = await apiClient.get("/collection");
+            const { data } = await apiClient.get("/api/collection");
             return data;
         },
         enabled: typeof window !== 'undefined' && !!localStorage.getItem("token"),
@@ -39,7 +39,7 @@ export const useCollectionStats = () => {
     return useQuery<CollectionStats>({
         queryKey: ["collection", "stats"],
         queryFn: async () => {
-            const { data } = await apiClient.get("/collection/stats");
+            const { data } = await apiClient.get("/api/collection/stats");
             return data;
         },
         enabled: typeof window !== 'undefined' && !!localStorage.getItem("token"),

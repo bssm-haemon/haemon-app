@@ -7,7 +7,7 @@ export const useGoogleLogin = () => {
     return useMutation({
         mutationFn: async (authCode: string) => {
             // 백엔드가 code 필드를 기대하는 경우
-            const { data } = await apiClient.post("/auth/google", { code: authCode });
+            const { data } = await apiClient.post("/api/auth/google", { code: authCode });
             return data;
         },
         onSuccess: (data) => {
@@ -21,7 +21,7 @@ export const useLogout = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async () => {
-            await apiClient.post("/auth/logout");
+            await apiClient.post("/api/auth/logout");
         },
         onSuccess: () => {
             localStorage.removeItem("token");
@@ -35,7 +35,7 @@ export const useMe = () => {
     return useQuery<User>({
         queryKey: ["auth-me"],
         queryFn: async () => {
-            const { data } = await apiClient.get("/auth/me");
+            const { data } = await apiClient.get("/api/auth/me");
             return data;
         },
         enabled: typeof window !== 'undefined' && !!localStorage.getItem("token"),

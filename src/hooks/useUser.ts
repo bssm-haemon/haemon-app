@@ -6,7 +6,7 @@ export const useUserDetail = () => {
   return useQuery<User>({
     queryKey: ["user-me"],
     queryFn: async () => {
-      const { data } = await apiClient.get("/users/me");
+      const { data } = await apiClient.get("/api/users/me");
       return data;
     },
     enabled: typeof window !== 'undefined' && !!localStorage.getItem("token"),
@@ -17,7 +17,7 @@ export const useUpdateProfile = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (payload: { nickname?: string; profile_image?: string }) => {
-      const { data } = await apiClient.patch("/users/me", payload);
+      const { data } = await apiClient.patch("/api/users/me", payload);
       return data;
     },
     onSuccess: () => {
@@ -31,7 +31,7 @@ export const useUserProfile = (userId: string) => {
   return useQuery<User>({
     queryKey: ["users", userId],
     queryFn: async () => {
-      const { data } = await apiClient.get(`/users/${userId}`);
+      const { data } = await apiClient.get(`/api/users/${userId}`);
       return data;
     },
     enabled: !!userId,

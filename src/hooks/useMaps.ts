@@ -33,7 +33,7 @@ export const useSightingMarkers = (params?: { status?: string; category?: string
     return useQuery<MarkersResponse<SightingMarker>>({
         queryKey: ["map-sightings", params],
         queryFn: async () => {
-            const { data } = await apiClient.get("/maps/sightings", { params });
+            const { data } = await apiClient.get("/api/maps/sightings", { params });
             return data;
         },
     });
@@ -43,7 +43,7 @@ export const useCleanupMarkers = (params?: { status?: string; trash_type?: strin
     return useQuery<MarkersResponse<CleanupMarker>>({
         queryKey: ["map-cleanups", params],
         queryFn: async () => {
-            const { data } = await apiClient.get("/maps/cleanups", { params });
+            const { data } = await apiClient.get("/api/maps/cleanups", { params });
             return data;
         },
     });
@@ -53,7 +53,7 @@ export const useHeatmap = (type: "sighting" | "cleanup" | "combined" = "combined
     return useQuery({
         queryKey: ["map-heatmap", type],
         queryFn: async () => {
-            const { data } = await apiClient.get("/maps/heatmap", { params: { type } });
+            const { data } = await apiClient.get("/api/maps/heatmap", { params: { type } });
             return data;
         },
     });

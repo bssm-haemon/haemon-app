@@ -16,7 +16,7 @@ export const useAllBadges = (options?: { enabled?: boolean }) => {
     return useQuery<BadgesResponse>({
         queryKey: ["badges"],
         queryFn: async () => {
-            const { data } = await apiClient.get("/badges");
+            const { data } = await apiClient.get("/api/badges");
             return data;
         },
         enabled: options?.enabled,
@@ -27,7 +27,7 @@ export const useMyBadges = () => {
     return useQuery<MyBadgesResponse>({
         queryKey: ["my-badges"],
         queryFn: async () => {
-            const { data } = await apiClient.get("/badges/my");
+            const { data } = await apiClient.get("/api/badges/my");
             return data;
         },
     });
@@ -37,7 +37,7 @@ export const useAwardBadge = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async ({ badge_id, user_id }: { badge_id: string; user_id: string }) => {
-            const { data } = await apiClient.post(`/badges/${badge_id}/award/${user_id}`);
+            const { data } = await apiClient.post(`/api/badges/${badge_id}/award/${user_id}`);
             return data;
         },
         onSuccess: () => {

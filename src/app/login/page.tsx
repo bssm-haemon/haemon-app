@@ -82,6 +82,7 @@ export default function LoginPage() {
                     height={120}
                     priority
                     className="drop-shadow-2xl"
+                    style={{ width: "auto", height: "auto" }}
                 />
                 <button
                     onClick={handleGoogleLogin}

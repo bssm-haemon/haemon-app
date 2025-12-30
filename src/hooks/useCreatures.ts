@@ -11,7 +11,7 @@ export const useCreatures = (params?: { category?: CreatureCategory; rarity?: Ra
     return useQuery<CreaturesResponse>({
         queryKey: ["creatures", params],
         queryFn: async () => {
-            const { data } = await apiClient.get("/creatures", { params });
+            const { data } = await apiClient.get("/api/creatures", { params });
             return data;
         },
         enabled: options?.enabled,
@@ -22,7 +22,7 @@ export const useCreatureDetail = (id: string) => {
     return useQuery<Creature>({
         queryKey: ["creatures", id],
         queryFn: async () => {
-            const { data } = await apiClient.get(`/creatures/${id}`);
+            const { data } = await apiClient.get(`/api/creatures/${id}`);
             return data;
         },
         enabled: !!id,
@@ -33,7 +33,7 @@ export const useCreateCreature = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async (creature: Partial<Creature>) => {
-            const { data } = await apiClient.post("/creatures", creature);
+            const { data } = await apiClient.post("/api/creatures", creature);
             return data;
         },
         onSuccess: () => {
@@ -46,7 +46,7 @@ export const useUpdateCreature = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async ({ id, ...creature }: Partial<Creature> & { id: string }) => {
-            const { data } = await apiClient.put(`/creatures/${id}`, creature);
+            const { data } = await apiClient.put(`/api/creatures/${id}`, creature);
             return data;
         },
         onSuccess: (_, variables) => {
@@ -60,7 +60,7 @@ export const useDeleteCreature = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async (id: string) => {
-            await apiClient.delete(`/creatures/${id}`);
+            await apiClient.delete(`/api/creatures/${id}`);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["creatures"] });
