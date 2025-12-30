@@ -21,6 +21,7 @@ export interface Creature {
   id: string;
   name: string;
   name_en: string;
+  summary?: string;
   category: CreatureCategory;
   description: string;
   image_url: string;
