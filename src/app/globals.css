@@ -124,3 +124,51 @@ select {
 .animate-slide-up {
   animation: slide-up 0.4s ease-out;
 }
+
+/* Poketball loader animation */
+@keyframes poketball-throw {
+  0% { transform: translateX(-18%) translateY(6%) rotate(-10deg); }
+  50% { transform: translateX(15%) translateY(-18%) rotate(18deg); }
+  100% { transform: translateX(0) translateY(0) rotate(0deg); }
+}
+
+@keyframes poketball-shadow {
+  0%, 100% { transform: scale(0.9); opacity: 0.4; }
+  50% { transform: scale(1.05); opacity: 0.7; }
+}
+
+@keyframes poketball-shake {
+  0% { transform: translateX(-4px) rotate(-10deg); }
+  20% { transform: translateX(4px) rotate(12deg); }
+  40% { transform: translateX(-3px) rotate(-8deg); }
+  60% { transform: translateX(3px) rotate(8deg); }
+  80% { transform: translateX(-2px) rotate(-4deg); }
+  100% { transform: translateX(0) rotate(0deg); }
+}
+
+.poketball-throw {
+  animation: poketball-throw 0.9s ease-in-out infinite alternate;
+}
+
+.poketball-shadow {
+  position: absolute;
+  inset: auto 8px 4px 8px;
+  height: 10px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0));
+  animation: poketball-shadow 0.9s ease-in-out infinite alternate;
+}
+
+.poketball-spin {
+  animation:
+    poketball-throw 1s ease-in-out infinite alternate,
+    poketball-shake 1.2s ease-in-out infinite;
+  transform-origin: center;
+}
+
+.poketball-blue {
+  filter: drop-shadow(0 6px 12px rgba(37, 99, 235, 0.35));
+}
+.poketball-green {
+  filter: drop-shadow(0 6px 12px rgba(34, 197, 94, 0.35));
+}
