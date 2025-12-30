@@ -416,7 +416,7 @@ export default function AdminPage() {
                           <p className="text-xs text-gray-500">
                             {creature.category} · {creature.rarity} · {creature.points}p
                           </p>
-                          <p className="text-sm text-gray-700 mt-1 line-clamp-2">{creature.description}</p>
+                          <p className="text-sm text-gray-700 mt-1 line-clamp-2">{creature.summary}</p>
                         </div>
                         <div className="flex flex-col gap-2">
                           <button
