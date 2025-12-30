@@ -26,21 +26,24 @@ const BadgeSection = memo(function BadgeSection({ myBadges }: { myBadges: any })
   return (
     <div className="grid grid-cols-3 gap-3">
       {myBadges.badges.map((item: any, idx: number) => (
-        <div key={`${item.badge?.id}-${idx}`} className="rounded-lg p-3 bg-gray-50 flex flex-col items-center gap-2">
+        <div
+          key={`${item.badge?.id}-${idx}`}
+          className="rounded-2xl p-3 bg-gradient-to-br from-yellow-50 to-yellow-100 flex flex-col items-center gap-2 border-2 border-yellow-200 hover:scale-105 transition-transform duration-300 cursor-pointer shadow-md"
+        >
           {item.badge?.name || item.badge?.name_ko ? (
             <Image
               src={getBadgeImage(item.badge.name_ko || item.badge.name)}
               alt={item.badge.name_ko || item.badge.name}
               width={72}
               height={72}
-              className="rounded-lg object-contain"
+              className="rounded-lg object-contain drop-shadow-lg"
             />
           ) : (
-            <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500">
+            <div className="w-16 h-16 bg-white rounded-lg flex items-center justify-center text-yellow-500 shadow-md">
               <Award size={20} />
             </div>
           )}
-          <p className="text-sm font-semibold text-center text-gray-900 leading-tight">
+          <p className="text-xs font-bold text-center text-gray-900 leading-tight">
             {item.badge.name_ko || item.badge.name}
           </p>
         </div>
@@ -57,32 +60,35 @@ const RecentActivitySection = memo(function RecentActivitySection({ sightingsDat
   return (
     <div className="space-y-3">
       {sightingsData.sightings.map((sighting: any) => (
-        <div key={sighting.id} className="bg-gray-50 rounded-lg p-3 border border-gray-200 space-y-2">
+        <div
+          key={sighting.id}
+          className="bg-white rounded-2xl p-4 border-2 border-blue-100 hover:border-blue-300 hover:shadow-lg transition-all duration-300 space-y-2"
+        >
           <div className="flex items-center justify-between">
-            <p className="text-sm font-semibold text-gray-900">{sighting.memo || "메모 없음"}</p>
-            <span className="text-[11px] text-gray-500 flex items-center gap-1">
+            <p className="text-sm font-bold text-gray-900">{sighting.memo || "메모 없음"}</p>
+            <span className="text-xs text-gray-500 flex items-center gap-1 bg-gray-100 px-2 py-1 rounded-full">
               <Clock size={12} />
               {new Date(sighting.created_at).toLocaleDateString()}
             </span>
           </div>
-          <p className="text-xs text-gray-600 flex items-center gap-1">
-            <MapPin size={12} className="text-gray-400" />
-            {sighting.location_name || "위치 미기입"}
+          <p className="text-xs text-gray-600 flex items-center gap-2">
+            <MapPin size={14} className="text-blue-500" />
+            <span className="font-medium">{sighting.location_name || "위치 미기입"}</span>
           </p>
-          <p className="text-xs text-gray-700">
+          <p className="text-xs text-gray-700 font-semibold">
             {sighting.creature_id
               ? `${getCreatureById(sighting.creature_id)?.name || "미확인"} 발견!`
               : sighting.ai_suggestion
               ? `AI 제안: ${sighting.ai_suggestion}`
               : "AI 분석 대기"}
           </p>
-          <div className="flex items-center gap-2 text-[11px]">
+          <div className="flex items-center gap-2 text-xs pt-2 border-t border-gray-100">
             <span
-              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full ${
+              className={`inline-flex items-center gap-1 px-3 py-1 rounded-full font-bold ${
                 sighting.status === "approved"
                   ? "bg-green-100 text-green-700"
                   : sighting.status === "pending"
-                  ? "bg-amber-100 text-amber-700"
+                  ? "bg-yellow-100 text-yellow-700"
                   : "bg-red-100 text-red-700"
               }`}
             >
@@ -90,7 +96,9 @@ const RecentActivitySection = memo(function RecentActivitySection({ sightingsDat
               {sighting.status === "approved" ? "승인됨" : sighting.status === "pending" ? "검수중" : "거절"}
             </span>
             {typeof sighting.points_earned === "number" && sighting.points_earned > 0 && (
-              <span className="text-blue-600 font-semibold">+{sighting.points_earned}p</span>
+              <span className="ml-auto font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
+                +{sighting.points_earned}p
+              </span>
             )}
           </div>
         </div>
@@ -105,23 +113,29 @@ const RankingSection = memo(function RankingSection({ rankingsData }: { rankings
   }
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       {rankingsData.rankings.slice(0, 3).map((item: any) => (
         <div
           key={item.user_id}
-          className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
+          className="flex items-center justify-between p-4 bg-white rounded-2xl border-2 border-yellow-200 hover:border-yellow-400 hover:shadow-lg transition-all duration-300 hover:scale-102"
         >
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             <span
-              className={`font-bold text-lg ${
-                item.rank === 1 ? "text-yellow-500" : item.rank === 2 ? "text-gray-400" : "text-orange-600"
+              className={`font-black text-xl w-10 h-10 flex items-center justify-center rounded-full ${
+                item.rank === 1
+                  ? "bg-gradient-to-br from-yellow-400 to-yellow-500 text-white"
+                  : item.rank === 2
+                  ? "bg-gradient-to-br from-gray-300 to-gray-400 text-white"
+                  : "bg-gradient-to-br from-orange-400 to-orange-500 text-white"
               }`}
             >
-              #{item.rank}
+              {item.rank}
             </span>
-            <span className="font-medium text-sm text-gray-900">{item.nickname}</span>
+            <span className="font-bold text-gray-900">{item.nickname}</span>
           </div>
-          <span className="font-bold text-blue-600">{item.value.toLocaleString()}p</span>
+          <span className="font-black text-lg text-blue-600 bg-blue-50 px-4 py-2 rounded-full">
+            {item.value.toLocaleString()}p
+          </span>
         </div>
       ))}
     </div>
@@ -144,24 +158,24 @@ export const HomePageContent = memo(function HomePageContent() {
         <PokemonHeader />
 
         {/* User Stats - Pokémon Go Style */}
-        <div className="bg-gradient-to-br from-red-500 via-yellow-400 to-orange-500 rounded-2xl p-6 text-white shadow-lg">
+        <div className="bg-gradient-to-br from-blue-500 to-cyan-400 rounded-3xl p-6 text-white shadow-xl hover:shadow-2xl transition-all duration-300">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <p className="text-sm font-semibold opacity-95 uppercase tracking-wide">포인트</p>
+              <p className="text-xs font-bold opacity-90 uppercase tracking-wider">포인트</p>
               <p className="text-4xl font-black">{user?.points?.toLocaleString() ?? 0}</p>
             </div>
-            <div className="bg-white bg-opacity-20 backdrop-blur-sm rounded-full p-4">
-              <Zap size={40} className="text-yellow-200" />
+            <div className="bg-white bg-opacity-30 backdrop-blur-md rounded-full p-4 animate-pulse">
+              <Zap size={40} className="text-yellow-300" />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white border-opacity-30">
-            <div>
-              <p className="text-xs font-bold opacity-90 uppercase">레벨</p>
-              <p className="text-3xl font-black">{userLevel}</p>
+          <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white border-opacity-40">
+            <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-2xl p-3">
+              <p className="text-xs font-bold opacity-80 uppercase">레벨</p>
+              <p className="text-3xl font-black mt-1">{userLevel}</p>
             </div>
-            <div>
-              <p className="text-xs font-bold opacity-90 uppercase">도감</p>
-              <p className="text-3xl font-black">
+            <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-2xl p-3">
+              <p className="text-xs font-bold opacity-80 uppercase">도감</p>
+              <p className="text-3xl font-black mt-1">
                 {stats?.discovered_count ?? 0}/{stats?.total_creatures ?? 0}
               </p>
             </div>
@@ -170,15 +184,15 @@ export const HomePageContent = memo(function HomePageContent() {
 
         {/* Quick Stats */}
         <div className="grid grid-cols-2 gap-3">
-          <div className="bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl p-4 border-4 border-blue-500 shadow-lg text-white">
+          <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-4 text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer">
             <TrendingUp className="text-blue-100 mb-2" size={24} />
             <p className="text-xs font-bold opacity-90 uppercase">최근 소득</p>
-            <p className="text-2xl font-black">+{recentIncome}p</p>
+            <p className="text-2xl font-black mt-1">+{recentIncome}p</p>
           </div>
-          <div className="bg-gradient-to-br from-purple-400 to-purple-600 rounded-xl p-4 border-4 border-purple-500 shadow-lg text-white">
-            <Trophy className="text-purple-100 mb-2" size={24} />
+          <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-4 text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer">
+            <Trophy className="text-green-100 mb-2" size={24} />
             <p className="text-xs font-bold opacity-90 uppercase">목격</p>
-            <p className="text-2xl font-black">{user?.sighting_count ?? 0}</p>
+            <p className="text-2xl font-black mt-1">{user?.sighting_count ?? 0}</p>
           </div>
         </div>
 
