@@ -46,7 +46,6 @@ body {
   width: 100%;
   height: 100%;
   margin: 0;
-  padding: 0 0 calc(var(--spacing) * 20) 0;
 }
 
 * {
@@ -127,23 +126,48 @@ select {
 
 /* Poketball loader animation */
 @keyframes poketball-throw {
-  0% { transform: translateX(-18%) translateY(6%) rotate(-10deg); }
-  50% { transform: translateX(15%) translateY(-18%) rotate(18deg); }
-  100% { transform: translateX(0) translateY(0) rotate(0deg); }
+  0% {
+    transform: translateX(-18%) translateY(6%) rotate(-10deg);
+  }
+  50% {
+    transform: translateX(15%) translateY(-18%) rotate(18deg);
+  }
+  100% {
+    transform: translateX(0) translateY(0) rotate(0deg);
+  }
 }
 
 @keyframes poketball-shadow {
-  0%, 100% { transform: scale(0.9); opacity: 0.4; }
-  50% { transform: scale(1.05); opacity: 0.7; }
+  0%,
+  100% {
+    transform: scale(0.9);
+    opacity: 0.4;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.7;
+  }
 }
 
 @keyframes poketball-shake {
-  0% { transform: translateX(-4px) rotate(-10deg); }
-  20% { transform: translateX(4px) rotate(12deg); }
-  40% { transform: translateX(-3px) rotate(-8deg); }
-  60% { transform: translateX(3px) rotate(8deg); }
-  80% { transform: translateX(-2px) rotate(-4deg); }
-  100% { transform: translateX(0) rotate(0deg); }
+  0% {
+    transform: translateX(-4px) rotate(-10deg);
+  }
+  20% {
+    transform: translateX(4px) rotate(12deg);
+  }
+  40% {
+    transform: translateX(-3px) rotate(-8deg);
+  }
+  60% {
+    transform: translateX(3px) rotate(8deg);
+  }
+  80% {
+    transform: translateX(-2px) rotate(-4deg);
+  }
+  100% {
+    transform: translateX(0) rotate(0deg);
+  }
 }
 
 .poketball-throw {
@@ -160,9 +184,7 @@ select {
 }
 
 .poketball-spin {
-  animation:
-    poketball-throw 1s ease-in-out infinite alternate,
-    poketball-shake 1.2s ease-in-out infinite;
+  animation: poketball-throw 1s ease-in-out infinite alternate, poketball-shake 1.2s ease-in-out infinite;
   transform-origin: center;
 }
 
