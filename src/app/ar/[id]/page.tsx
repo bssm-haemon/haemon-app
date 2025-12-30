@@ -168,9 +168,10 @@ export default function ARPage({ params }: { params: Promise<{ id: string }> }) 
           {/* @ts-ignore - model-viewer is a web component */}
           <model-viewer
             src={modelUrl}
+            ios-src={modelUsdZUrl} // iOS AR Quick Look 지원
             alt={`3D model of ${creature.name}`}
             ar
-            ar-modes="webxr scene-viewer quick-look"
+            ar-modes="quick-look webxr scene-viewer"
             ar-placement="floor"
             ar-scale="auto"
             camera-controls
@@ -188,6 +189,7 @@ export default function ARPage({ params }: { params: Promise<{ id: string }> }) 
               <Maximize size={24} />
               <span className="text-lg">내 공간에 소환하기</span>
             </button>
+            {/* @ts-ignore */}
           </model-viewer>
 
           {/* Error Overlay */}

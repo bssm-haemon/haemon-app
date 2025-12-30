@@ -28,6 +28,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
+    "src/types/**/*.d.ts", // Explicitly include custom declaration files
     "**/*.mts"
   ],
   "exclude": ["node_modules"]
