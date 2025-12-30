@@ -74,6 +74,49 @@ body {
   }
 }
 
+/* 모바일 최적화 */
+@supports (padding: max(0px)) {
+  body {
+    padding-left: max(0px, env(safe-area-inset-left));
+    padding-right: max(0px, env(safe-area-inset-right));
+  }
+
+  nav {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* 터치 친화적 사이즈 */
+button,
+input,
+textarea {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* 스크롤 성능 최적화 */
+main {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 모바일 입력 필드 확대 방지 */
+input,
+textarea,
+select {
+  font-size: 16px;
+}
+
+/* 뷰포트 meta 태그 대체 스타일 */
+@media (max-width: 640px) {
+  body {
+    font-size: 14px;
+  }
+
+  main {
+    padding: 0;
+  }
+}
+
 .animate-fade-in {
   animation: fade-in 0.3s ease-out;
 }

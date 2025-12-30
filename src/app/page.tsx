@@ -22,7 +22,7 @@ export default function HomePage() {
 
   return (
     <MainLayout>
-      <div className="p-4 space-y-6">
+      <div className="p-4 space-y-6 pb-4">
         <PokemonHeader />
 
         {/* User Stats - Pokémon Go Style */}
