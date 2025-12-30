@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Plus, BookOpen, Map, User, ShieldCheck } from "lucide-react";
+import { Home, Plus, BookOpen, Map, User, ShieldCheck, ShoppingBag } from "lucide-react";
 import clsx from "clsx";
 import { useUserDetail } from "@/hooks/useUser";
 
@@ -14,6 +14,7 @@ export default function BottomNavBar() {
     { href: "/", icon: Home, label: "홈" },
     { href: "/register", icon: Plus, label: "등록" },
     { href: "/collection", icon: BookOpen, label: "도감" },
+    { href: "/market", icon: ShoppingBag, label: "마켓" },
     { href: "/map", icon: Map, label: "지도" },
     ...(user?.is_admin ? [{ href: "/admin", icon: ShieldCheck, label: "관리" }] : []),
     { href: "/profile", icon: User, label: "프로필" },
