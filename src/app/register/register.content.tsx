@@ -183,8 +183,7 @@ const RegisterPageContent = memo(() => {
         router.push("/");
       },
       onError: error => {
-        const detail =
-          (error as AxiosError)?.response?.data && (error as AxiosError<{ detail?: string }>).response?.data?.detail;
+        const detail: string | undefined = (error as AxiosError<{ detail?: string }>)?.response?.data?.detail;
         showToast(detail || "목격 등록에 실패했습니다. 다시 시도해주세요.");
       },
     });
@@ -213,8 +212,7 @@ const RegisterPageContent = memo(() => {
         router.push("/");
       },
       onError: (error: unknown) => {
-        const detail =
-          (error as AxiosError)?.response?.data && (error as AxiosError<{ detail?: string }>).response?.data?.detail;
+        const detail: string | undefined = (error as AxiosError<{ detail?: string }>)?.response?.data?.detail;
         const message = error instanceof Error ? error.message : "";
         if (detail?.includes("이미 등록된 사진") || message.includes("이미 등록된 사진") || message.includes("중복")) {
           showToast("중복된 사진은 안됩니다.");
