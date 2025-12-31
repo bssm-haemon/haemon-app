@@ -10,6 +10,8 @@ import Script from "next/script";
 
 type FilterType = "all" | "sighting" | "cleanup";
 
+const DEFAULT_CENTER = { lat: 37.4979, lng: 127.0276 };
+
 export default function MapPage() {
   const [filter, setFilter] = useState<FilterType>("all");
   const [mapLoaded, setMapLoaded] = useState(false);
@@ -100,7 +102,7 @@ export default function MapPage() {
 
     try {
       const options = {
-        center: new window.kakao.maps.LatLng(37.4979, 127.0276),
+        center: new window.kakao.maps.LatLng(DEFAULT_CENTER.lat, DEFAULT_CENTER.lng),
         level: 8,
       };
 
@@ -180,7 +182,21 @@ export default function MapPage() {
     }
 
     markersRef.current = markers;
-  }, [filter, sightingData, cleanupData, mapError]);
+
+    // 표시 중인 마커 좌표에 맞춰 지도 영역을 자동 조정
+    if (markers.length > 0) {
+      const bounds = new window.kakao.maps.LatLngBounds();
+      markers.forEach(marker => bounds.extend(marker.getPosition()));
+      mapRef.current.setBounds(bounds);
+    } else if (currentLocation) {
+      const currentLatLng = new window.kakao.maps.LatLng(currentLocation.lat, currentLocation.lng);
+      mapRef.current.setCenter(currentLatLng);
+      mapRef.current.setLevel(6);
+    } else {
+      mapRef.current.setCenter(new window.kakao.maps.LatLng(DEFAULT_CENTER.lat, DEFAULT_CENTER.lng));
+      mapRef.current.setLevel(8);
+    }
+  }, [filter, sightingData, cleanupData, mapError, currentLocation]);
 
   if (!kakaoApiKey) {
     return (
